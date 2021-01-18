@@ -4,7 +4,7 @@
     </a>
     <br>
     <br>
-    <a href="#">
+    <a href="https://github.com/BibleBot/backend/blob/master/go.mod">
         <img alt="GitHub go.mod Go version" src="https://img.shields.io/github/go-mod/go-version/BibleBot/backend?label=go">
     </a>
     <a alt="Go Report Card" href="https://goreportcard.com/report/github.com/BibleBot/backend">
@@ -13,8 +13,8 @@
     <a alt="Discord" href="https://discord.gg/H7ZyHqE">
         <img alt="Discord" src="https://img.shields.io/discord/362503610006765568?label=discord">
     </a>
-    <a href="#">
-        <img alt="GitHub" src="https://img.shields.io/github/license/BibleBot/backend">
+    <a href="https://github.com/BibleBot/backend/blob/master/LICENSE.txt">
+        <img alt="MPL-2.0" src="https://img.shields.io/github/license/BibleBot/backend">
     </a>
 </p>
 <p align="center">
