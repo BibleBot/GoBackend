@@ -34,3 +34,6 @@ https/ssl.key
 
 # ignore decrypted USX archives
 data/usx/*.tar.zst
+
+# ignore config file
+config.yml
