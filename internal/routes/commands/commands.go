@@ -1,5 +1,8 @@
 package commands
 
+// Just a place to point to the right command.
+// Possibly create a Command struct to expect similar results? Might be easier said than done.
+
 import (
 	"github.com/gofiber/fiber/v2"
 )

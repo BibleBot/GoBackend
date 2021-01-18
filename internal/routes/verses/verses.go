@@ -1,5 +1,7 @@
 package verses
 
+// Parse message with parsing.go, then generate a reference here and process it.
+
 import (
 	"github.com/gofiber/fiber/v2"
 )
