@@ -1,6 +1,21 @@
-# Backend
-
-The Backend API for BibleBot.
+<p align="center">
+    <a alt="Backend" href="https://biblebot.xyz">
+        <img alt="Backend" width="400px" src="https://i.imgur.com/JVBY24z.png">
+    </a>
+    <br>
+    <br>
+    <img alt="GitHub go.mod Go version" src="https://img.shields.io/github/go-mod/go-version/BibleBot/backend?label=go">
+    <a alt="Go Report Card" href="https://goreportcard.com/report/github.com/BibleBot/backend">
+        <img alt="Go Report Card" src="https://goreportcard.com/badge/github.com/biblebot/backend">
+    </a>
+    <a alt="Discord" href="https://discord.gg/H7ZyHqE">
+        <img alt="Discord" src="https://img.shields.io/discord/362503610006765568?label=discord">
+    </a>
+    <img alt="GitHub" src="https://img.shields.io/github/license/BibleBot/backend">
+</p>
+<p align="center">
+    The Backend API for BibleBot.
+</p>
 
 ## Internal Organization
 
