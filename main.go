@@ -1,5 +1,7 @@
 package main
 
+// Eventually we'll get Kamva/mgm to take care of db stuff.
+
 import (
 	"fmt"
 	"log"
