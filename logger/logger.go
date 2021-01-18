@@ -4,42 +4,42 @@ package logger
 // but it seems to be more complicated than what we're needing
 
 import (
-    "errors"
+	"errors"
 
-    "github.com/fatih/color"
+	"github.com/fatih/color"
 )
 
-
+// Log messages to console.
 func Log(level string, source string, msg string) error {
-    if level == "err" {
-        level = "erro"
-    }
+	if level == "err" {
+		level = "erro"
+	}
 
-    prefixColor := color.New()
+	prefixColor := color.New()
 
-    switch level {
-    case "info":
-        prefixColor.Add(color.FgHiCyan)
-    case "warn":
-        prefixColor.Add(color.FgHiYellow)
-    case "erro":
-        prefixColor.Add(color.FgHiRed)
-    default:
-        return errors.New("invalid log level")
-    }
-    
-    prefixColor.Printf("[%s] ", level)
+	switch level {
+	case "info":
+		prefixColor.Add(color.FgHiCyan)
+	case "warn":
+		prefixColor.Add(color.FgHiYellow)
+	case "erro":
+		prefixColor.Add(color.FgHiRed)
+	default:
+		return errors.New("invalid log level")
+	}
 
-    sourceColor := color.New(color.FgHiMagenta)
-    sourceColor.Printf("<%s> ", source)
+	prefixColor.Printf("[%s] ", level)
 
-    msgColor := color.New(color.Reset)
+	sourceColor := color.New(color.FgHiMagenta)
+	sourceColor.Printf("<%s> ", source)
 
-    if source == "init" {
-        msgColor.Add(color.FgHiGreen)
-    }
+	msgColor := color.New(color.Reset)
 
-    msgColor.Println(msg)
+	if source == "init" {
+		msgColor.Add(color.FgHiGreen)
+	}
 
-    return nil
+	msgColor.Println(msg)
+
+	return nil
 }

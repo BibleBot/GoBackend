@@ -1,5 +1,5 @@
 package settings
 
 func router() {
-    return
+	return
 }

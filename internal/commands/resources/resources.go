@@ -1,5 +1,5 @@
 package resources
 
 func router() {
-    return
+	return
 }
