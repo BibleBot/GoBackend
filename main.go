@@ -1,10 +1,8 @@
 package main
 
 import (
-    "os"
     "fmt"
     "log"
-    "crypto/tls"
 
     "backend/logger"
 
@@ -25,25 +23,10 @@ func main() {
     // basic HTML page indicating what's running.
     app := fiber.New(fiberConfig)
     app.Static("/", "static")
-
+    
     // Cables need not apply.
     commands.RegisterRouter(app)
     verses.RegisterRouter(app)
 
-    // Here's the fun HTTPS stuff.
-    cert, err := tls.LoadX509KeyPair("https/ssl.cert", "https/ssl.key")
-    if err != nil {
-        logger.Log("err", "https", err.Error());
-        os.Exit(1);
-    }
-
-    sslConfig := &tls.Config{Certificates: []tls.Certificate{ cert }}
-
-    httpsListener, err := tls.Listen("tcp", ":443", sslConfig)
-    if err != nil {
-        logger.Log("err", "https", err.Error());
-        os.Exit(2);
-    }
-
-    log.Fatal(app.Listener(httpsListener))
+    log.Fatal(app.ListenTLS(":443", "https/ssl.cert", "https/ssl.key"))
 }
