@@ -4,14 +4,18 @@
     </a>
     <br>
     <br>
-    <img alt="GitHub go.mod Go version" src="https://img.shields.io/github/go-mod/go-version/BibleBot/backend?label=go">
+    <a href="#">
+        <img alt="GitHub go.mod Go version" src="https://img.shields.io/github/go-mod/go-version/BibleBot/backend?label=go">
+    </a>
     <a alt="Go Report Card" href="https://goreportcard.com/report/github.com/BibleBot/backend">
         <img alt="Go Report Card" src="https://goreportcard.com/badge/github.com/biblebot/backend">
     </a>
     <a alt="Discord" href="https://discord.gg/H7ZyHqE">
         <img alt="Discord" src="https://img.shields.io/discord/362503610006765568?label=discord">
     </a>
-    <img alt="GitHub" src="https://img.shields.io/github/license/BibleBot/backend">
+    <a href="#">
+        <img alt="GitHub" src="https://img.shields.io/github/license/BibleBot/backend">
+    </a>
 </p>
 <p align="center">
     The Backend API for BibleBot.
