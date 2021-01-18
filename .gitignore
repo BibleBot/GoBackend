@@ -27,3 +27,7 @@
 *.code-workspace
 
 # End of https://www.toptal.com/developers/gitignore/api/go,vscode
+
+# ignore ssl cert and key
+https/ssl.cert
+https/ssl.key
