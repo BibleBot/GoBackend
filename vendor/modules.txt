@@ -31,6 +31,15 @@ github.com/valyala/fasthttp/reuseport
 github.com/valyala/fasthttp/stackless
 # github.com/valyala/tcplisten v0.0.0-20161114210144-ceec8f93295a
 github.com/valyala/tcplisten
+# golang.org/x/crypto v0.0.0-20201221181555-eec23a3978ad
+## explicit
+golang.org/x/crypto/cast5
+golang.org/x/crypto/openpgp
+golang.org/x/crypto/openpgp/armor
+golang.org/x/crypto/openpgp/elgamal
+golang.org/x/crypto/openpgp/errors
+golang.org/x/crypto/openpgp/packet
+golang.org/x/crypto/openpgp/s2k
 # golang.org/x/sys v0.0.0-20201210223839-7e3030f88018
 golang.org/x/sys/internal/unsafeheader
 golang.org/x/sys/unix
