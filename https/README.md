@@ -1,0 +1,1 @@
+Place your certificate (`ssl.cert`) and your key (`ssl.key`) here.

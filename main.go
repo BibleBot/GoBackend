@@ -1,28 +1,49 @@
 package main
 
 import (
-	"fmt"
-	"log"
+    "os"
+    "fmt"
+    "log"
+    "crypto/tls"
 
-	"backend/logger"
+    "backend/logger"
 
-	"backend/internal/commands"
-	"backend/internal/verses"
+    "backend/internal/commands"
+    "backend/internal/verses"
 
-	"github.com/gofiber/fiber/v2"
+    "github.com/gofiber/fiber/v2"
 )
 
 var version = "v1.0.0"
 
+var fiberConfig = fiber.Config{DisableStartupMessage: true}
+
 func main() {
-	logger.Log("info", "global", fmt.Sprintf("BibleBot Backend %s by Evangelion Ltd.", version))
+    logger.Log("info", "init", fmt.Sprintf("BibleBot Backend %s by Evangelion Ltd.", version))
 
-	app := fiber.New()
+    // By default, we'll just serve a
+    // basic HTML page indicating what's running.
+    app := fiber.New(fiberConfig)
+    app.Static("/", "static")
 
-	app.Static("/", "static")
+    // Cables need not apply.
+    commands.RegisterRouter(app)
+    verses.RegisterRouter(app)
 
-	commands.RegisterRouter(app)
-	verses.RegisterRouter(app)
+    // Here's the fun HTTPS stuff.
+    cert, err := tls.LoadX509KeyPair("https/ssl.cert", "https/ssl.key")
+    if err != nil {
+        logger.Log("err", "https", err.Error());
+        os.Exit(1);
+    }
 
-	log.Fatal(app.Listen(":3000"))
+    sslConfig := &tls.Config{Certificates: []tls.Certificate{ cert }}
+
+    httpsListener, err := tls.Listen("tcp", ":443", sslConfig)
+    if err != nil {
+        logger.Log("err", "https", err.Error());
+        os.Exit(2);
+    }
+
+    log.Fatal(app.Listener(httpsListener))
 }
