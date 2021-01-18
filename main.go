@@ -4,9 +4,8 @@ import (
 	"fmt"
 	"log"
 
-	"backend/logger"
-
 	"backend/internal/commands"
+	"backend/internal/logger"
 	"backend/internal/verses"
 
 	"github.com/gofiber/fiber/v2"
