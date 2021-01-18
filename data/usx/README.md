@@ -1,4 +1,4 @@
-Encrypted `*.zstd` files containing `*.usx` files will be stored here for internal use.
+Encrypted `*.tar.zst` files containing `*.usx` files will be stored here for internal use.
 
 These are encrypted as it contains copyrighted material that Evangelion Ltd. has been granted permission to use in the BibleBot service.
 
