@@ -1,5 +1,5 @@
 package resources
 
 func verses() {
-	return
+    return
 }
