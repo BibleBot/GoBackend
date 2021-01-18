@@ -31,3 +31,6 @@
 # ignore ssl cert and key
 https/ssl.cert
 https/ssl.key
+
+# ignore decrypted USX archives
+data/usx/*.tar.zst
