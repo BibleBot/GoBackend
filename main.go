@@ -92,6 +92,8 @@ func extractAllData(config *Config) error {
 		if extractdata.ExtractData(input, config.DecryptionKey) != nil {
 			failed = true
 			failedInput = input
+		} else {
+			logger.Log("info", "extractAllData", "extraction successful")
 		}
 	}
 
@@ -99,6 +101,5 @@ func extractAllData(config *Config) error {
 		return fmt.Errorf("failed to extract: %s", failedInput)
 	}
 
-	logger.Log("info", "extractAllData", "extraction successful")
 	return nil
 }

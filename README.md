@@ -36,6 +36,8 @@ openssl req -x509 -newkey rsa:4096 -keyout https/ssl.key -out https/ssl.cert -da
 ## Production Setup
 ```bash
 git clone https://github.com/BibleBot/backend && cd backend
+cd data/usx && git clone https://github.com/BibleBot/EncryptedData # private repo with encrypted USX data
+cd ../..
 # place the production cert + key in https/ at this point
 mkdir -p bin && go build -o bin
 bin/backend.exe
