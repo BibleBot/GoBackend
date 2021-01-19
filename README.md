@@ -45,7 +45,7 @@ git clone https://github.com/BibleBot/backend && cd backend
 cd data/usx && git clone https://github.com/BibleBot/EncryptedData . # private repo with encrypted USX data (optional for self-host)
 cd ../..
 cp config.example.yml && $EDITOR config.yml
-# place the production cert + key in https/ at this point
+# place the production cert + key in https/ at this point, named "ssl.cert" and "ssl.key"
 docker build -t backend .
 docker run -dp 443:443 backend
 ```
