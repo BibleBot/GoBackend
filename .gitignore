@@ -32,10 +32,11 @@
 https/ssl.cert
 https/ssl.key
 
-# ignore decrypted USX archives
+# ignore USX archives
 data/usx/*/
 data/usx/*.tar
 data/usx/*.tar.zst
+data/usx/*.tar.zst.gpg
 
 # ignore config file
 config.yml

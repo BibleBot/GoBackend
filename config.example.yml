@@ -1,3 +1,5 @@
 ownerID: "" # Discord ID of owner
 apiBible: "" # API.Bible key
 decryptionKey: "" # Applicable decryption key
+encryptedFiles:
+  - "" # list all tar.zst.gpg files by name here

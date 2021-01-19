@@ -24,9 +24,10 @@ var fiberConfig = fiber.Config{DisableStartupMessage: true}
 
 // Config is based off config.yml.
 type Config struct {
-	OwnerID       string `yaml:"ownerID"`
-	APIBible      string `yaml:"apiBible"`
-	DecryptionKey string `yaml:"decryptionKey"`
+	OwnerID        string   `yaml:"ownerID"`
+	APIBible       string   `yaml:"apiBible"`
+	DecryptionKey  string   `yaml:"decryptionKey"`
+	EncryptedFiles []string `yaml:"encryptedFiles"`
 }
 
 func main() {
@@ -36,7 +37,7 @@ func main() {
 	config := readConfig()
 
 	// Extract all applicable data files.
-	extractAllData(config.DecryptionKey)
+	extractAllData(config)
 
 	// By default, we'll just serve a
 	// basic HTML page indicating what's running.
@@ -68,19 +69,10 @@ func readConfig() *Config {
 	return &config
 }
 
-func extractAllData(password string) error {
-	encryptedFiles := []string{
-		"CSB",
-		"GW",
-		"NASB",
-		"WYC",
-		"NBLA",
-		"AMP",
-	}
-
+func extractAllData(config *Config) error {
 	var absInputs []string
 
-	for _, file := range encryptedFiles {
+	for _, file := range config.EncryptedFiles {
 		localInputPath := fmt.Sprintf("./data/usx/%s.tar.zst.gpg", file)
 
 		absInputPath, err := filepath.Abs(localInputPath)
@@ -97,7 +89,7 @@ func extractAllData(password string) error {
 	for _, input := range absInputs {
 		logger.Log("info", "extractAllData", fmt.Sprintf("extracting %s", input))
 
-		if extractdata.ExtractData(input, password) != nil {
+		if extractdata.ExtractData(input, config.DecryptionKey) != nil {
 			failed = true
 			failedInput = input
 		}
