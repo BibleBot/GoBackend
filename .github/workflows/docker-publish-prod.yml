@@ -1,4 +1,4 @@
-name: Docker (Production)
+name: docker (prod)
 
 on:
   push:
