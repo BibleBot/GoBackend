@@ -4,6 +4,13 @@
     </a>
     <br>
     <br>
+    <a href="https://github.com/BibleBot/backend/actions?query=workflow%3A%22Docker+%28Development%29%22">
+        <img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/BibleBot/backend/Docker%20(Development)?label=build%20%28dev%29">
+    </a>
+    <a href="https://github.com/BibleBot/backend/actions?query=workflow%3A%22Docker+%28Production%29%22">
+        <img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/BibleBot/backend/Docker%20(Production)?label=build%20%28prod%29">
+    </a>
+    <br>
     <a href="https://github.com/BibleBot/backend/blob/master/go.mod">
         <img alt="GitHub go.mod Go version" src="https://img.shields.io/github/go-mod/go-version/BibleBot/backend?label=go">
     </a>
@@ -16,6 +23,7 @@
     <a href="https://github.com/BibleBot/backend/blob/master/LICENSE.txt">
         <img alt="MPL-2.0" src="https://img.shields.io/github/license/BibleBot/backend">
     </a>
+
 </p>
 <p align="center">
     The Backend API for BibleBot.
