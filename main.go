@@ -15,6 +15,7 @@ import (
 	"github.com/BibleBot/backend/internal/routes/verses"
 	"github.com/BibleBot/backend/internal/utils/extractdata"
 	"github.com/BibleBot/backend/internal/utils/logger"
+	"github.com/BibleBot/backend/internal/utils/namefetcher"
 
 	"github.com/gofiber/fiber/v2"
 	"gopkg.in/yaml.v2"
@@ -32,6 +33,7 @@ type Config struct {
 	LetsEncryptEmail string   `yaml:"letsEncryptEmail"`
 	DecryptionKey    string   `yaml:"decryptionKey"`
 	EncryptedFiles   []string `yaml:"encryptedFiles"`
+	IsDryRun         bool     `yaml:"isDryRun"`
 }
 
 func main() {
@@ -39,6 +41,9 @@ func main() {
 
 	// Create configuration from config.yml.
 	config := readConfig()
+
+	// Fetch book names.
+	namefetcher.FetchBookNames(config.APIBible, config.IsDryRun)
 
 	// Extract all applicable data files.
 	extractAllData(config)
@@ -128,8 +133,6 @@ func extractAllData(config *Config) error {
 		if extractdata.ExtractData(input, config.DecryptionKey) != nil {
 			failed = true
 			failedInput = input
-		} else {
-			logger.Log("info", "extractAllData", "extraction successful")
 		}
 	}
 
@@ -137,5 +140,6 @@ func extractAllData(config *Config) error {
 		return fmt.Errorf("failed to extract: %s", failedInput)
 	}
 
+	logger.Log("info", "extractAllData", "extraction successful")
 	return nil
 }

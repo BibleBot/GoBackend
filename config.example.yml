@@ -1,5 +1,6 @@
 ownerID: "" # Discord ID of owner
 apiBible: "" # API.Bible key
+dry: false # should namefetcher skip itself?
 letsEncryptEmail: "" # Email for Let's Encrypt notifications.
 decryptionKey: "" # Applicable decryption key
 encryptedFiles:

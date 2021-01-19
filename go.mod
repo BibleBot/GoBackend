@@ -3,6 +3,8 @@ module github.com/BibleBot/backend
 go 1.15
 
 require (
+	github.com/PuerkitoBio/goquery v1.6.1
+	github.com/briandowns/spinner v1.12.0
 	github.com/fatih/color v1.10.0
 	github.com/gofiber/fiber/v2 v2.3.3
 	github.com/klauspost/compress v1.11.7

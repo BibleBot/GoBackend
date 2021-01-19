@@ -40,3 +40,6 @@ data/usx/*.tar.zst.gpg
 
 # ignore config file
 config.yml
+
+# ignore completed book names
+data/names/completed_names.json
