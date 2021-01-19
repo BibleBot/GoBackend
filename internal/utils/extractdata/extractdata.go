@@ -41,5 +41,5 @@ func ExtractData(inputPath string, outputPath string, password string) error {
 		return err
 	}
 
-	return decompression.Decompress(bytesReader, outputFile)
+	return decompression.DecompressZstd(bytesReader, outputFile)
 }

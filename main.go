@@ -80,7 +80,7 @@ func extractAllData(password string) error {
 
 	for _, file := range encryptedFiles {
 		localInputPath := fmt.Sprintf("./data/usx/%s.tar.zst.gpg", file)
-		localOutputPath := fmt.Sprintf("./data/usx/%s.tar.zst", file)
+		localOutputPath := fmt.Sprintf("./data/usx/%s.tar", file)
 
 		absInputPath, err := filepath.Abs(localInputPath)
 		if err != nil {

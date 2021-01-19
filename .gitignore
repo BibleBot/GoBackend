@@ -33,6 +33,8 @@ https/ssl.cert
 https/ssl.key
 
 # ignore decrypted USX archives
+data/usx/*/
+data/usx/*.tar
 data/usx/*.tar.zst
 
 # ignore config file
