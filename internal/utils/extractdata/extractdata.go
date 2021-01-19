@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"io"
 	"io/ioutil"
-	"os"
 	"strings"
 
 	"backend/internal/utils/extractdata/decompression"
@@ -13,7 +12,7 @@ import (
 )
 
 // ExtractData extracts *.tar.zst and *.tar.zst.gpg files.
-func ExtractData(inputPath string, outputPath string, password string) error {
+func ExtractData(inputPath string, password string) error {
 	inputFile, err := ioutil.ReadFile(inputPath)
 	if err != nil {
 		logger.Log("err", "extractdata@read", err.Error())
@@ -35,11 +34,5 @@ func ExtractData(inputPath string, outputPath string, password string) error {
 		bytesReader = bytes.NewReader(inputFile)
 	}
 
-	outputFile, err := os.OpenFile(outputPath, os.O_WRONLY|os.O_CREATE, 0600)
-	if err != nil {
-		logger.Log("err", "extractdata@write", err.Error())
-		return err
-	}
-
-	return decompression.DecompressZstd(bytesReader, outputFile)
+	return decompression.Decompress(bytesReader)
 }

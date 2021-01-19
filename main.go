@@ -76,33 +76,26 @@ func extractAllData(password string) error {
 		"WYC",
 	}
 
-	absInputsToOutputs := make(map[string]string)
+	var absInputs []string
 
 	for _, file := range encryptedFiles {
 		localInputPath := fmt.Sprintf("./data/usx/%s.tar.zst.gpg", file)
-		localOutputPath := fmt.Sprintf("./data/usx/%s.tar", file)
 
 		absInputPath, err := filepath.Abs(localInputPath)
 		if err != nil {
-			logger.Log("err", "main@extractAllData", fmt.Sprintf("couldn't get absolute path of input: %s", localInputPath))
+			logger.Log("err", "extractAllData", fmt.Sprintf("couldn't get absolute path of input: %s", localInputPath))
 			return err
 		}
 
-		absOutputPath, err := filepath.Abs(localOutputPath)
-		if err != nil {
-			logger.Log("err", "main@extractAllData", fmt.Sprintf("couldn't get absolute path of output: %s", localOutputPath))
-			return err
-		}
-
-		absInputsToOutputs[absInputPath] = absOutputPath
+		absInputs = append(absInputs, absInputPath)
 	}
 
 	failed := false
 	var failedInput string
-	for input, output := range absInputsToOutputs {
-		logger.Log("info", "main@extractAllData", fmt.Sprintf("extracting %s to %s", input, output))
+	for _, input := range absInputs {
+		logger.Log("info", "extractAllData", fmt.Sprintf("extracting %s", input))
 
-		if extractdata.ExtractData(input, output, password) != nil {
+		if extractdata.ExtractData(input, password) != nil {
 			failed = true
 			failedInput = input
 		}
@@ -112,6 +105,6 @@ func extractAllData(password string) error {
 		return fmt.Errorf("failed to extract: %s", failedInput)
 	}
 
-	logger.Log("info", "main@extractAllData", "extraction successful")
+	logger.Log("info", "extractAllData", "extraction successful")
 	return nil
 }

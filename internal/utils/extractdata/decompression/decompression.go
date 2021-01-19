@@ -1,20 +1,74 @@
 package decompression
 
 import (
-	"errors"
+	"archive/tar"
+	"fmt"
 	"io"
+	"os"
+	"path/filepath"
 
 	"github.com/klauspost/compress/zstd"
 )
 
-// DecompressZstd does what it's named.
-func DecompressZstd(r io.Reader, w io.Writer) error {
+// Decompress decompresses a .tar.zst file.
+func Decompress(r io.Reader) error {
 	zstdReader, err := zstd.NewReader(r)
 	if err != nil {
-		return errors.New("couldn't create zstd reader")
+		return err
 	}
-	defer zstdReader.Close()
 
-	_, err = io.Copy(w, zstdReader)
-	return err
+	absPath, err := filepath.Abs("./data/usx/")
+	if err != nil {
+		return err
+	}
+
+	tr := tar.NewReader(zstdReader)
+	for {
+		hdr, err := tr.Next()
+
+		if err == io.EOF {
+			break
+		}
+
+		if err != nil {
+			return err
+		}
+
+		fInfo := hdr.FileInfo()
+		fileName := hdr.Name
+		absFileName := filepath.Join(absPath, fileName)
+
+		if fInfo.Mode().IsDir() {
+			if err := os.MkdirAll(absFileName, 0755); err != nil {
+				return err
+			}
+
+			continue
+		}
+
+		file, err := os.OpenFile(
+			absFileName,
+			os.O_RDWR|os.O_CREATE|os.O_TRUNC,
+			fInfo.Mode().Perm(),
+		)
+
+		if err != nil {
+			return err
+		}
+
+		n, cpErr := io.Copy(file, tr)
+		if closeErr := file.Close(); closeErr != nil {
+			return err
+		}
+
+		if cpErr != nil {
+			return cpErr
+		}
+
+		if n != fInfo.Size() {
+			return fmt.Errorf("wrote %d, want %d", n, fInfo.Size())
+		}
+	}
+
+	return nil
 }
