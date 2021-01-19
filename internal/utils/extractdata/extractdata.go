@@ -6,9 +6,9 @@ import (
 	"io/ioutil"
 	"strings"
 
-	"backend/internal/utils/extractdata/decompression"
-	"backend/internal/utils/extractdata/decryption"
-	"backend/internal/utils/logger"
+	"github.com/BibleBot/backend/internal/utils/extractdata/decompression"
+	"github.com/BibleBot/backend/internal/utils/extractdata/decryption"
+	"github.com/BibleBot/backend/internal/utils/logger"
 )
 
 // ExtractData extracts *.tar.zst and *.tar.zst.gpg files.

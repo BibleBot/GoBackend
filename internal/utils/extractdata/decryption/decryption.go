@@ -1,10 +1,11 @@
 package decryption
 
 import (
-	"backend/internal/utils/logger"
 	"bytes"
 	"errors"
 	"io/ioutil"
+
+	"github.com/BibleBot/backend/internal/utils/logger"
 
 	"golang.org/x/crypto/openpgp"
 	"golang.org/x/crypto/openpgp/packet"

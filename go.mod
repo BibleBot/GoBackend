@@ -1,4 +1,4 @@
-module backend
+module github.com/BibleBot/backend
 
 go 1.15
 

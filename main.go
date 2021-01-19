@@ -10,10 +10,10 @@ import (
 
 	"path/filepath"
 
-	"backend/internal/routes/commands"
-	"backend/internal/routes/verses"
-	"backend/internal/utils/extractdata"
-	"backend/internal/utils/logger"
+	"github.com/BibleBot/backend/internal/routes/commands"
+	"github.com/BibleBot/backend/internal/routes/verses"
+	"github.com/BibleBot/backend/internal/utils/extractdata"
+	"github.com/BibleBot/backend/internal/utils/logger"
 
 	"github.com/gofiber/fiber/v2"
 	"gopkg.in/yaml.v2"
