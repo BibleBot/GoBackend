@@ -25,10 +25,16 @@
 
 While the backend repository itself is a monolith, multiple packages will exist in `internal/` that all hook into the base API. These packages are internal, since they'd be pretty useless on their own.
 
+## Prerequisites
+
+- Go v1.15
+- Docker (for production)
+- An SSL certificate.
+
 ## Development Setup
 ```bash
 git clone https://github.com/BibleBot/backend && cd backend
-
+cp config.example.yml config.yml && $EDITOR config.yml
 # just fill in random information for this self-signed cert
 openssl req -x509 -newkey rsa:4096 -keyout https/ssl.key -out https/ssl.cert -days 365 -nodes -sha256
 ```
@@ -36,11 +42,12 @@ openssl req -x509 -newkey rsa:4096 -keyout https/ssl.key -out https/ssl.cert -da
 ## Production Setup
 ```bash
 git clone https://github.com/BibleBot/backend && cd backend
-cd data/usx && git clone https://github.com/BibleBot/EncryptedData . # private repo with encrypted USX data
+cd data/usx && git clone https://github.com/BibleBot/EncryptedData . # private repo with encrypted USX data (optional for self-host)
 cd ../..
+cp config.example.yml && $EDITOR config.yml
 # place the production cert + key in https/ at this point
-mkdir -p bin && go build -o bin
-bin/backend.exe
+docker build -t backend .
+docker run -dp 443:443 backend
 ```
 
 ## Special Thanks
