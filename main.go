@@ -74,6 +74,8 @@ func extractAllData(password string) error {
 		"GW",
 		"NASB",
 		"WYC",
+		"NBLA",
+		"AMP",
 	}
 
 	var absInputs []string
