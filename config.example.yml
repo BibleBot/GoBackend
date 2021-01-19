@@ -1,5 +1,6 @@
 ownerID: "" # Discord ID of owner
 apiBible: "" # API.Bible key
+letsEncryptEmail: "" # Email for Let's Encrypt notifications.
 decryptionKey: "" # Applicable decryption key
 encryptedFiles:
   - "" # list all tar.zst.gpg files by name here

@@ -27,10 +27,11 @@ var fiberConfig = fiber.Config{DisableStartupMessage: true}
 
 // Config is based off config.yml.
 type Config struct {
-	OwnerID        string   `yaml:"ownerID"`
-	APIBible       string   `yaml:"apiBible"`
-	DecryptionKey  string   `yaml:"decryptionKey"`
-	EncryptedFiles []string `yaml:"encryptedFiles"`
+	OwnerID          string   `yaml:"ownerID"`
+	APIBible         string   `yaml:"apiBible"`
+	LetsEncryptEmail string   `yaml:"letsEncryptEmail"`
+	DecryptionKey    string   `yaml:"decryptionKey"`
+	EncryptedFiles   []string `yaml:"encryptedFiles"`
 }
 
 func main() {
@@ -64,6 +65,7 @@ func main() {
 	} else {
 		m := &autocert.Manager{
 			Prompt:     autocert.AcceptTOS,
+			Email:      config.LetsEncryptEmail,
 			HostPolicy: autocert.HostWhitelist(os.Args[1]),
 			Cache:      autocert.DirCache("./https"),
 		}
