@@ -4,11 +4,11 @@
     </a>
     <br>
     <br>
-    <a href="https://github.com/BibleBot/backend/actions?query=workflow%3A%22Docker+%28Development%29%22">
-        <img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/BibleBot/backend/Docker%20(Development)?label=build%20%28dev%29">
+    <a href="https://github.com/BibleBot/backend/actions?query=workflow%3A%22docker+%28dev%29%22">
+        <img alt="GitHub Workflow Status" src="https://github.com/BibleBot/backend/workflows/docker%20(dev)/badge.svg">
     </a>
-    <a href="https://github.com/BibleBot/backend/actions?query=workflow%3A%22Docker+%28Production%29%22">
-        <img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/BibleBot/backend/Docker%20(Production)?label=build%20%28prod%29">
+    <a href="https://github.com/BibleBot/backend/actions?query=workflow%3A%22docker+%28prod%29%22">
+        <img alt="GitHub Workflow Status" src="https://github.com/BibleBot/backend/workflows/docker%20(prod)/badge.svg">
     </a>
     <br>
     <a href="https://github.com/BibleBot/backend/blob/master/go.mod">
