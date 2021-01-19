@@ -35,6 +35,7 @@ While the backend repository itself is a monolith, multiple packages will exist 
 ```bash
 git clone https://github.com/BibleBot/backend && cd backend
 cp config.example.yml config.yml && $EDITOR config.yml
+
 # just fill in random information for this self-signed cert
 openssl req -x509 -newkey rsa:4096 -keyout https/ssl.key -out https/ssl.cert -days 365 -nodes -sha256
 ```
@@ -42,9 +43,12 @@ openssl req -x509 -newkey rsa:4096 -keyout https/ssl.key -out https/ssl.cert -da
 ## Production Setup
 ```bash
 git clone https://github.com/BibleBot/backend && cd backend
-cd data/usx && git clone https://github.com/BibleBot/EncryptedData . # private repo with encrypted USX data (optional for self-host)
-cd ../..
 cp config.example.yml && $EDITOR config.yml
+
+# private repo with encrypted USX data (optional for self-host)
+cd data/usx && git clone https://github.com/BibleBot/EncryptedData .
+cd ../..
+
 # place the production cert + key in https/ at this point, named "ssl.cert" and "ssl.key"
 docker build -t backend .
 docker run -dp 443:443 backend
