@@ -28,16 +28,14 @@ While the backend repository itself is a monolith, multiple packages will exist 
 ## Prerequisites
 
 - Go v1.15
-- Docker (for production)
+- Docker.
 - An SSL certificate.
 
 ## Development Setup
 ```bash
 git clone https://github.com/BibleBot/backend && cd backend
-cp config.example.yml config.yml && $EDITOR config.yml
-
-# just fill in random information for this self-signed cert
-openssl req -x509 -newkey rsa:4096 -keyout https/ssl.key -out https/ssl.cert -days 365 -nodes -sha256
+cp config.example.yml config.yml
+# edit config.yml before running
 ```
 
 ## Production Setup
@@ -49,8 +47,9 @@ cp config.example.yml && $EDITOR config.yml
 cd data/usx && git clone https://github.com/BibleBot/EncryptedData .
 cd ../..
 
-# place the production cert + key in https/ at this point, named "ssl.cert" and "ssl.key"
-docker build -t backend .
+# build production container
+# the build-arg is optional if you're wanting localhost without HTTPS
+docker build --build-arg DOMAIN=<domain> -t backend .
 docker run -dp 443:443 backend
 ```
 

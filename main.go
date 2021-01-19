@@ -3,6 +3,7 @@ package main
 // Eventually we'll get Kamva/mgm to take care of db stuff.
 
 import (
+	"crypto/tls"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -17,6 +18,8 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"gopkg.in/yaml.v2"
+
+	"golang.org/x/crypto/acme/autocert"
 )
 
 var version = "v1.0.0"
@@ -48,7 +51,38 @@ func main() {
 	commands.RegisterRouter(app)
 	verses.RegisterRouter(app)
 
-	log.Fatal(app.ListenTLS(":443", "https/ssl.cert", "https/ssl.key"))
+	// Set up HTTPS based on domain argument.
+	var domain string
+	if len(os.Args) != 2 {
+		domain = "localhost"
+	} else {
+		domain = os.Args[1]
+	}
+
+	if domain == "localhost" {
+		log.Fatal(app.Listen(":80"))
+	} else {
+		m := &autocert.Manager{
+			Prompt:     autocert.AcceptTOS,
+			HostPolicy: autocert.HostWhitelist(os.Args[1]),
+			Cache:      autocert.DirCache("./https"),
+		}
+
+		cfg := &tls.Config{
+			GetCertificate: m.GetCertificate,
+			NextProtos: []string{
+				"http/1.1", "acme-tls/1",
+			},
+		}
+
+		ln, err := tls.Listen("tcp", ":443", cfg)
+		if err != nil {
+			logger.Log("err", "init", "couldn't create tls listener")
+			os.Exit(1)
+		}
+
+		log.Fatal(app.Listener(ln))
+	}
 }
 
 func readConfig() *Config {
