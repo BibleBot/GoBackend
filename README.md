@@ -36,8 +36,7 @@ While the backend repository itself is a monolith, multiple packages will exist 
 ## Prerequisites
 
 - Go v1.15
-- Docker.
-- An SSL certificate.
+- Docker
 
 ## Self-Host Setup
 ```bash
