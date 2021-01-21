@@ -33,7 +33,7 @@ type Config struct {
 	LetsEncryptEmail string   `yaml:"letsEncryptEmail"`
 	DecryptionKey    string   `yaml:"decryptionKey"`
 	EncryptedFiles   []string `yaml:"encryptedFiles"`
-	IsDryRun         bool     `yaml:"isDryRun"`
+	IsDryRun         bool     `yaml:"dry"`
 }
 
 func main() {
@@ -112,6 +112,8 @@ func readConfig() *Config {
 	return &config
 }
 
+// This is a wrapper for internal/utils/extractdata.
+// We're using the same name just to make logging more uniform.
 func extractData(config *Config) error {
 	var absInputs []string
 
@@ -124,7 +126,10 @@ func extractData(config *Config) error {
 			return err
 		}
 
-		absInputs = append(absInputs, absInputPath)
+		_, err = os.Stat(absInputPath)
+		if !os.IsNotExist(err) {
+			absInputs = append(absInputs, absInputPath)
+		}
 	}
 
 	failed := false
@@ -142,6 +147,9 @@ func extractData(config *Config) error {
 		return fmt.Errorf("failed to extract: %s", failedInput)
 	}
 
-	logger.Log("info", "extractdata", "extraction successful")
+	if len(absInputs) > 0 {
+		logger.Log("info", "extractdata", "extraction successful")
+	}
+
 	return nil
 }
