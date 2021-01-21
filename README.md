@@ -39,24 +39,13 @@ While the backend repository itself is a monolith, multiple packages will exist 
 - Docker.
 - An SSL certificate.
 
-## Development Setup
-```bash
-git clone https://github.com/BibleBot/backend && cd backend
-cp config.example.yml config.yml
-# edit config.yml before running
-```
-
-## Production Setup
+## Self-Host Setup
 ```bash
 git clone https://github.com/BibleBot/backend && cd backend
 cp config.example.yml && $EDITOR config.yml
 
-# private repo with encrypted USX data (optional for self-host)
-cd data/usx && git clone https://github.com/BibleBot/EncryptedData .
-cd ../..
-
 # build production container
-# the build-arg is optional if you're wanting localhost without HTTPS
+# the build-arg is optional if you're wanting localhost *without* HTTPS
 docker build --build-arg DOMAIN=<domain> -t backend .
 docker run -dp 443:443 backend
 ```
