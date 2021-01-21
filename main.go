@@ -46,7 +46,7 @@ func main() {
 	namefetcher.FetchBookNames(config.APIBible, config.IsDryRun)
 
 	// Extract all applicable data files.
-	extractAllData(config)
+	extractData(config)
 
 	// By default, we'll just serve a
 	// basic HTML page indicating what's running.
@@ -112,7 +112,7 @@ func readConfig() *Config {
 	return &config
 }
 
-func extractAllData(config *Config) error {
+func extractData(config *Config) error {
 	var absInputs []string
 
 	for _, file := range config.EncryptedFiles {
@@ -120,7 +120,7 @@ func extractAllData(config *Config) error {
 
 		absInputPath, err := filepath.Abs(localInputPath)
 		if err != nil {
-			logger.Log("err", "extractAllData", fmt.Sprintf("couldn't get absolute path of input: %s", localInputPath))
+			logger.Log("err", "extractdata", fmt.Sprintf("couldn't get absolute path of input: %s", localInputPath))
 			return err
 		}
 
@@ -130,7 +130,7 @@ func extractAllData(config *Config) error {
 	failed := false
 	var failedInput string
 	for _, input := range absInputs {
-		logger.Log("info", "extractAllData", fmt.Sprintf("extracting %s", input))
+		logger.Log("info", "extractdata", fmt.Sprintf("extracting %s", input))
 
 		if extractdata.ExtractData(input, config.DecryptionKey) != nil {
 			failed = true
@@ -142,6 +142,6 @@ func extractAllData(config *Config) error {
 		return fmt.Errorf("failed to extract: %s", failedInput)
 	}
 
-	logger.Log("info", "extractAllData", "extraction successful")
+	logger.Log("info", "extractdata", "extraction successful")
 	return nil
 }
