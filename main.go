@@ -66,6 +66,7 @@ func main() {
 	}
 
 	if domain == "localhost" {
+		logger.Log("info", "init", "initialization complete. running on http://localhost")
 		log.Fatal(app.Listen(":80"))
 	} else {
 		m := &autocert.Manager{
@@ -88,6 +89,7 @@ func main() {
 			os.Exit(1)
 		}
 
+		logger.Log("info", "init", fmt.Sprintf("initialization complete. running at https://%s", domain))
 		log.Fatal(app.Listener(ln))
 	}
 }
