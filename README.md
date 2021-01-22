@@ -7,6 +7,9 @@
     <a href="https://github.com/BibleBot/backend/actions?query=workflow%3A%22docker+%28dev%29%22">
         <img alt="GitHub Workflow Status" src="https://github.com/BibleBot/backend/workflows/docker%20(dev)/badge.svg">
     </a>
+    <a href="https://github.com/BibleBot/backend/actions?query=workflow%3Atests">
+        <img alt="GitHub Test Status" src="https://github.com/BibleBot/backend/workflows/tests/badge.svg">
+    </a>
     <a href="https://github.com/BibleBot/backend/actions?query=workflow%3A%22docker+%28prod%29%22">
         <img alt="GitHub Workflow Status" src="https://github.com/BibleBot/backend/workflows/docker%20(prod)/badge.svg">
     </a>
