@@ -37,7 +37,7 @@ type Config struct {
 }
 
 func main() {
-	logger.Log("info", "init", fmt.Sprintf("BibleBot Backend %s by Evangelion Ltd.", version))
+	logger.Log("info", "init", fmt.Sprintf("BibleBot Backend %s by Kerygma Digital", version))
 
 	// Create configuration from config.yml.
 	config := readConfig()

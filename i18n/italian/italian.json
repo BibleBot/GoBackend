@@ -1,6 +1,6 @@
 {
     "biblebot": "BibleBot <version>",
-    "credit": "Realizzato con ❤️ da Evangelion Ltd.",
+    "credit": "Realizzato con ❤️ da Kerygma Digital",
     "commandlist": "`<+><search>` - cerca un versetto usando parole chiave\n`<+><version>` - preferenze e informazioni della versione\n`<+><random>` - ottieni un versetto Biblico casuale\n`<+><truerandom>` - ottieni un versetto Biblico davvero casuale\n`<+><dailyverse>` - versetto del giorno e automazione\n`<+><formatting>` - preferenze di formattazione\n`<+><language>` - preferenze ed informazioni linguistiche \n`<+><misc>` - impostazioni generali del server\n`<+><stats>` - statistiche del bot\n`<+><invite>` - ottieni il link di invito per BibleBot\n\n`<+><creeds>` - dottrine ecumeniche (contiene ulteriori comandi)",
     "usage": "Per usare il bot, basta scrivere un versetto. Mi occupo io del resto.",
     "commandlistName": "Comandi",

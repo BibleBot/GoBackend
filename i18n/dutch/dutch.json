@@ -1,6 +1,6 @@
 {
     "biblebot": "BibleBot <version>",
-    "credit": "Met ❤️ gemaakt door Evangelion Ltd.",
+    "credit": "Met ❤️ gemaakt door Kerygma Digital",
     "commandlist": "`<+><search>` - zoek door middel van steekwoorden.\n`<+><version>` - versie-instellingen en -informatie.\n`<+><random>` - geeft een willekeurig bijbelvers.\n`<+><truerandom>` - geeft een volledig willekeurig bijbelvers.\n`<+><dailyverse>` - biijbelvers van de dag en automatisering hiervan.\n`<+><formatting>` - instellingen voor de opmaak van bijbelverzen \n`<+><language>` - taalinstellingen en -informatie.\n`<+><misc>` - overige server instellingen.\n`<+><stats>` - bekijk statistieken van de bot.\n`<+><invite>` - krijg de invite link voor BibleBot.\n\n`<+><creeds>` - oecumenische geloofsbelijdenissen. (bevat verdere commands)",
     "usage": "Om de bot te gebruiken hoeft je slechts een bijbelvers te zeggen, ik doe de rest wel.",
     "commandlistName": "Commands",

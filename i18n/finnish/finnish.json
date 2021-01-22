@@ -1,6 +1,6 @@
 {
     "biblebot": "BibleBot <version>",
-    "credit": "Tehnyt ❤️ Evangelion Ltd.",
+    "credit": "Tehnyt ❤️ Kerygma Digital",
     "commandlist": "`<+><search>` - hae avainsanoilla\n`<+><version>` - käännösasetukset ja tiedot\n`<+><random>` - saa satunnainen Raamatun jae\n`<+><truerandom>` - saa todella satunnainen Raamatun jae\n`<+><dailyverse>` - päivittäiset jakeet ja automaatio\n`<+><formatting>` - jaetyyppien muotoiluasetukset\n`<+><language>` - kieliasetukset ja tiedot\n`<+><misc>` - sekalaiset palvelinasetukset\n`<+><stats>` - näytä botin tilastot\n`<+><invite>` - hanki kutsulinkki BibleBotille\n\n`<+><creeds>` - ekumeeniset uskontunnustukset (sisältää lisäkomentoja)",
     "usage": "Käyttääksesi bottia, sano vain Raamatun jae. Minä hoidan loput.",
     "commandlistName": "Komennot",
