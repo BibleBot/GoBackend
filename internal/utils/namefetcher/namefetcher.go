@@ -23,9 +23,15 @@ var bookNames = make(map[string][]string)
 var defaultNames []string
 
 // GetBookNames returns map[string][]string of saved book names.
-func GetBookNames() (map[string][]string, error) {
+func GetBookNames(isTest bool) (map[string][]string, error) {
+	// If we're testing, the working directory is tests/, so paths need to be adjusted for that.
+	dir := "./"
+	if isTest {
+		dir = "./../"
+	}
+
 	// Get mapping of API.Bible books to BibleGateway, which we use as a standard.
-	file, err := ioutil.ReadFile("./data/names/completed_names.json")
+	file, err := ioutil.ReadFile(dir + "data/names/completed_names.json")
 	if err != nil {
 		logger.Log("err", "namefetcher", "failed to open completed_names.json, disable dry run")
 		return nil, err
@@ -36,9 +42,15 @@ func GetBookNames() (map[string][]string, error) {
 }
 
 // FetchBookNames goes through all of BibleGateway and API.Bible, scraping book names from each translation.
-func FetchBookNames(apiBibleKey string, isDryRun bool) error {
+func FetchBookNames(apiBibleKey string, isDryRun bool, isTest bool) error {
+	// If we're testing, the working directory is tests/, so paths need to be adjusted for that.
+	dir := "./"
+	if isTest {
+		dir = "./../"
+	}
+
 	// Get mapping of API.Bible books to BibleGateway, which we use as a standard.
-	file, err := ioutil.ReadFile("./data/names/apibible_names.json")
+	file, err := ioutil.ReadFile(dir + "data/names/apibible_names.json")
 	if err != nil {
 		logger.Log("err", "namefetcher", "failed to open apibible_names.json")
 		return err
@@ -46,7 +58,7 @@ func FetchBookNames(apiBibleKey string, isDryRun bool) error {
 	json.Unmarshal(file, &apiBibleNames)
 
 	// Get standard English abbreviations.
-	file, err = ioutil.ReadFile("./data/names/abbreviations.json")
+	file, err = ioutil.ReadFile(dir + "data/names/abbreviations.json")
 	if err != nil {
 		logger.Log("err", "namefetcher", "failed to open abbreviations.json")
 		return err
@@ -54,7 +66,7 @@ func FetchBookNames(apiBibleKey string, isDryRun bool) error {
 	json.Unmarshal(file, &abbreviations)
 
 	// Get standard book IDs.
-	file, err = ioutil.ReadFile("./data/names/default_names.json")
+	file, err = ioutil.ReadFile(dir + "data/names/default_names.json")
 	if err != nil {
 		logger.Log("err", "namefetcher", "failed to open default_names.json")
 		return err
@@ -68,7 +80,10 @@ func FetchBookNames(apiBibleKey string, isDryRun bool) error {
 	sp.Prefix = hiCyan("[info] ") + hiMagenta("<namefetcher> ")
 
 	if isDryRun {
-		sp.FinalMSG = hiCyan("[info] ") + hiMagenta("<namefetcher> ") + "✔️  Name fetching set to dry, skipping.\n"
+		if !isTest {
+			sp.FinalMSG = hiCyan("[info] ") + hiMagenta("<namefetcher> ") + "✔️  Name fetching set to dry, skipping.\n"
+		}
+
 		sp.Start()
 		sp.Stop()
 
@@ -97,9 +112,9 @@ func FetchBookNames(apiBibleKey string, isDryRun bool) error {
 
 	sp.Suffix = "  Writing to file..."
 
-	_, err = os.Stat("./data/names/completed_names.json")
+	_, err = os.Stat(dir + "data/names/completed_names.json")
 	if !os.IsNotExist(err) {
-		err = os.Remove("./data/names/completed_names.json")
+		err = os.Remove(dir + "data/names/completed_names.json")
 
 		if err != nil {
 			sp.Stop()
@@ -110,10 +125,10 @@ func FetchBookNames(apiBibleKey string, isDryRun bool) error {
 
 	completedNames := mergeThreeMaps(bgNames, abNames, abbreviations)
 
-	resultFile, err := os.OpenFile("./data/names/completed_names.json", os.O_CREATE, os.ModePerm)
+	resultFile, err := os.OpenFile(dir+"data/names/completed_names.json", os.O_CREATE, os.ModePerm)
 	if err != nil {
 		sp.Stop()
-		logger.Log("err", "namefetcher", "failed to open ./data/names/completed_names.json")
+		logger.Log("err", "namefetcher", "failed to open completed_names.json")
 		return err
 	}
 	defer resultFile.Close()
@@ -122,7 +137,7 @@ func FetchBookNames(apiBibleKey string, isDryRun bool) error {
 	err = jsonEncoder.Encode(completedNames)
 	if err != nil {
 		sp.Stop()
-		logger.Log("err", "namefetcher", "failed to write ./data/names/completed_names.json")
+		logger.Log("err", "namefetcher", "failed to write completed_names.json")
 		return err
 	}
 
