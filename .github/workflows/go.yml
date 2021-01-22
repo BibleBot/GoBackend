@@ -22,9 +22,9 @@ jobs:
       run: go build -v ./...
 
     - name: Test
-      run: cd tests && go test -json -v ./... > test.json
+      run: cd tests && go test -json -v ./... > results.json
     
     - name: Annotations
       uses: guyarb/golang-test-annotations@v0.3.0
       with:
-        test-results: test.json
+        test-results: tests/results.json
