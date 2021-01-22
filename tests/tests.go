@@ -60,9 +60,9 @@ func SetupApp() *fiber.App {
 func readConfig() *Config {
 	config := Config{}
 
-	file, err := ioutil.ReadFile("./../config.yml")
+	file, err := ioutil.ReadFile("./config.test.yml")
 	if os.IsNotExist(err) {
-		logger.Log("err", "config", "config.yml does not exist")
+		logger.Log("err", "config", "config.test.yml does not exist")
 		os.Exit(1)
 	} else if err != nil {
 		logger.Log("err", "config", err.Error())
