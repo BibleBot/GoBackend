@@ -21,6 +21,7 @@ var apiBibleNames = make(map[string]string)
 var abbreviations = make(map[string][]string)
 var bookNames = make(map[string][]string)
 var defaultNames []string
+var nuisances []string
 
 // GetBookNames returns map[string][]string of saved book names.
 func GetBookNames(isTest bool) (map[string][]string, error) {
@@ -33,7 +34,7 @@ func GetBookNames(isTest bool) (map[string][]string, error) {
 	// Get mapping of API.Bible books to BibleGateway, which we use as a standard.
 	file, err := ioutil.ReadFile(dir + "data/names/completed_names.json")
 	if err != nil {
-		logger.Log("err", "namefetcher", "failed to open completed_names.json, disable dry run")
+		logger.Log("err", "namefetcher", "failed to open completed_names.json, run backend normally before testing again")
 		return nil, err
 	}
 	json.Unmarshal(file, &bookNames)
@@ -43,14 +44,28 @@ func GetBookNames(isTest bool) (map[string][]string, error) {
 
 // FetchBookNames goes through all of BibleGateway and API.Bible, scraping book names from each translation.
 func FetchBookNames(apiBibleKey string, isDryRun bool, isTest bool) error {
-	// If we're testing, the working directory is tests/, so paths need to be adjusted for that.
-	dir := "./"
-	if isTest {
-		dir = "./../"
+	// Create a spinner, including our usual log prefixes.
+	hiCyan := color.New(color.FgHiCyan).SprintFunc()
+	hiMagenta := color.New(color.FgHiMagenta).SprintFunc()
+	sp := spinner.New(spinner.CharSets[14], 100*time.Millisecond)
+	sp.Prefix = hiCyan("[info] ") + hiMagenta("<namefetcher> ")
+
+	// We do not want to run on dry runs or testing.
+	if isDryRun {
+		sp.FinalMSG = hiCyan("[info] ") + hiMagenta("<namefetcher> ") + "✔️  Name fetching set to dry, skipping.\n"
+
+		sp.Start()
+		sp.Stop()
+
+		return nil
+	} else if isTest {
+		sp.FinalMSG = hiCyan("[info] ") + hiMagenta("<namefetcher> ") + "❌  Name fetching is disabled for tests, skipping.\n"
+
+		return nil
 	}
 
 	// Get mapping of API.Bible books to BibleGateway, which we use as a standard.
-	file, err := ioutil.ReadFile(dir + "data/names/apibible_names.json")
+	file, err := ioutil.ReadFile("./data/names/apibible_names.json")
 	if err != nil {
 		logger.Log("err", "namefetcher", "failed to open apibible_names.json")
 		return err
@@ -58,7 +73,7 @@ func FetchBookNames(apiBibleKey string, isDryRun bool, isTest bool) error {
 	json.Unmarshal(file, &apiBibleNames)
 
 	// Get standard English abbreviations.
-	file, err = ioutil.ReadFile(dir + "data/names/abbreviations.json")
+	file, err = ioutil.ReadFile("./data/names/abbreviations.json")
 	if err != nil {
 		logger.Log("err", "namefetcher", "failed to open abbreviations.json")
 		return err
@@ -66,30 +81,14 @@ func FetchBookNames(apiBibleKey string, isDryRun bool, isTest bool) error {
 	json.Unmarshal(file, &abbreviations)
 
 	// Get standard book IDs.
-	file, err = ioutil.ReadFile(dir + "data/names/default_names.json")
+	file, err = ioutil.ReadFile("./data/names/default_names.json")
 	if err != nil {
 		logger.Log("err", "namefetcher", "failed to open default_names.json")
 		return err
 	}
 	json.Unmarshal(file, &defaultNames)
 
-	// Create a spinner, including our usual log prefixes.
-	hiCyan := color.New(color.FgHiCyan).SprintFunc()
-	hiMagenta := color.New(color.FgHiMagenta).SprintFunc()
-	sp := spinner.New(spinner.CharSets[14], 100*time.Millisecond)
-	sp.Prefix = hiCyan("[info] ") + hiMagenta("<namefetcher> ")
-
-	if isDryRun {
-		if !isTest {
-			sp.FinalMSG = hiCyan("[info] ") + hiMagenta("<namefetcher> ") + "✔️  Name fetching set to dry, skipping.\n"
-		}
-
-		sp.Start()
-		sp.Stop()
-
-		return nil
-	}
-
+	// Pre-flight checks have cleared. Houston, we have liftoff.
 	bgVersions, err := getBibleGatewayVersions(sp)
 	if err != nil {
 		return err
@@ -112,9 +111,9 @@ func FetchBookNames(apiBibleKey string, isDryRun bool, isTest bool) error {
 
 	sp.Suffix = "  Writing to file..."
 
-	_, err = os.Stat(dir + "data/names/completed_names.json")
+	_, err = os.Stat("./data/names/completed_names.json")
 	if !os.IsNotExist(err) {
-		err = os.Remove(dir + "data/names/completed_names.json")
+		err = os.Remove("./data/names/completed_names.json")
 
 		if err != nil {
 			sp.Stop()
@@ -125,7 +124,7 @@ func FetchBookNames(apiBibleKey string, isDryRun bool, isTest bool) error {
 
 	completedNames := mergeThreeMaps(bgNames, abNames, abbreviations)
 
-	resultFile, err := os.OpenFile(dir+"data/names/completed_names.json", os.O_CREATE, os.ModePerm)
+	resultFile, err := os.OpenFile("./data/names/completed_names.json", os.O_CREATE, os.ModePerm)
 	if err != nil {
 		sp.Stop()
 		logger.Log("err", "namefetcher", "failed to open completed_names.json")
@@ -219,7 +218,8 @@ func getBibleGatewayNames(versions map[string]string, sp *spinner.Spinner) (map[
 				span.Remove()
 			})
 
-			dataName, exists := element.Attr("data-target")
+			dataName, _ := element.Attr("data-target")
+			_, exists := element.Attr("book-name")
 			if exists {
 				dataName = string([]rune(dataName)[1 : len(dataName)-5])
 				bookName := strings.TrimSpace(element.Text())
@@ -234,12 +234,15 @@ func getBibleGatewayNames(versions map[string]string, sp *spinner.Spinner) (map[
 					dataName = "praz"
 				}
 
-				if val, ok := names[dataName]; ok {
-					if !stringInSlice(bookName, val) {
-						names[dataName] = append(names[dataName], bookName)
+				err := isNuisance(bookName)
+				if err == nil {
+					if val, ok := names[dataName]; ok {
+						if !stringInSlice(bookName, val) {
+							names[dataName] = append(names[dataName], bookName)
+						}
+					} else {
+						names[dataName] = []string{bookName}
 					}
-				} else {
-					names[dataName] = []string{bookName}
 				}
 			}
 		})
@@ -363,17 +366,49 @@ func getAPIBibleNames(versions map[string]string, apiKey string, sp *spinner.Spi
 				continue
 			}
 
-			if val, ok := names[id]; ok {
-				if !stringInSlice(name, val) {
-					names[id] = append(names[id], name)
+			err := isNuisance(name)
+			if err == nil {
+				if val, ok := names[id]; ok {
+					if !stringInSlice(name, val) {
+						names[id] = append(names[id], name)
+					}
+				} else {
+					names[id] = []string{name}
 				}
-			} else {
-				names[id] = []string{name}
+			}
+
+			err = isNuisance(abbv)
+			if err == nil {
+				if val, ok := names[id]; ok {
+					if !stringInSlice(abbv, val) {
+						names[id] = append(names[id], abbv)
+					}
+				} else {
+					names[id] = []string{abbv}
+				}
 			}
 		}
 	}
 
 	return names, nil
+}
+
+func isNuisance(word string) error {
+	file, err := ioutil.ReadFile("./data/names/nuisances.json")
+	if err != nil {
+		logger.Log("err", "namefetcher", "failed to open nuisances.json")
+		return err
+	}
+	json.Unmarshal(file, &nuisances)
+
+	word = strings.ToLower(word)
+	abbreviated := fmt.Sprintf("%s.", word)
+
+	if stringInSlice(word, nuisances) || stringInSlice(abbreviated, nuisances) {
+		return errors.New("word is nuisance")
+	}
+
+	return nil
 }
 
 type m = map[string][]string
