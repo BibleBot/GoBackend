@@ -51,7 +51,8 @@ func FetchBookNames(apiBibleKey string, isDryRun bool, isTest bool) error {
 	sp.Prefix = hiCyan("[info] ") + hiMagenta("<namefetcher> ")
 
 	// We do not want to run on dry runs or testing.
-	if isDryRun {
+	if isDryRun && !isTest {
+
 		sp.FinalMSG = hiCyan("[info] ") + hiMagenta("<namefetcher> ") + "✔️  Name fetching set to dry, skipping.\n"
 
 		sp.Start()
