@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/BibleBot/backend/internal/utils/logger"
+	"github.com/BibleBot/backend/internal/utils/slices"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/briandowns/spinner"
@@ -24,7 +25,7 @@ var defaultNames []string
 var nuisances []string
 
 // GetBookNames returns map[string][]string of saved book names.
-func GetBookNames(isTest bool) (map[string][]string, error) {
+func GetBookNames(isTest bool) map[string][]string {
 	// If we're testing, the working directory is tests/, so paths need to be adjusted for that.
 	dir := "./"
 	if isTest {
@@ -34,12 +35,31 @@ func GetBookNames(isTest bool) (map[string][]string, error) {
 	// Get mapping of API.Bible books to BibleGateway, which we use as a standard.
 	file, err := ioutil.ReadFile(dir + "data/names/completed_names.json")
 	if err != nil {
-		logger.Log("err", "namefetcher", "failed to open completed_names.json, run backend normally before testing again")
-		return nil, err
+		logger.LogWithError("namefetcher", "failed to open completed_names.json, run backend normally before testing again", err)
+		os.Exit(3)
 	}
 	json.Unmarshal(file, &bookNames)
 
-	return bookNames, nil
+	return bookNames
+}
+
+// GetDefaultBookNames returns []string of default book names.
+func GetDefaultBookNames(isTest bool) []string {
+	// If we're testing, the working directory is tests/, so paths need to be adjusted for that.
+	dir := "./"
+	if isTest {
+		dir = "./../"
+	}
+
+	// Get mapping of API.Bible books to BibleGateway, which we use as a standard.
+	file, err := ioutil.ReadFile(dir + "data/names/default_names.json")
+	if err != nil {
+		logger.LogWithError("namefetcher", "failed to open default_names.json, run backend normally before testing again", err)
+		os.Exit(3)
+	}
+	json.Unmarshal(file, &defaultNames)
+
+	return defaultNames
 }
 
 // FetchBookNames goes through all of BibleGateway and API.Bible, scraping book names from each translation.
@@ -68,24 +88,21 @@ func FetchBookNames(apiBibleKey string, isDryRun bool, isTest bool) error {
 	// Get mapping of API.Bible books to BibleGateway, which we use as a standard.
 	file, err := ioutil.ReadFile("./data/names/apibible_names.json")
 	if err != nil {
-		logger.Log("err", "namefetcher", "failed to open apibible_names.json")
-		return err
+		return logger.LogWithError("namefetcher", "failed to open apibible_names.json", err)
 	}
 	json.Unmarshal(file, &apiBibleNames)
 
 	// Get standard English abbreviations.
 	file, err = ioutil.ReadFile("./data/names/abbreviations.json")
 	if err != nil {
-		logger.Log("err", "namefetcher", "failed to open abbreviations.json")
-		return err
+		return logger.LogWithError("namefetcher", "failed to open abbreviations.json", err)
 	}
 	json.Unmarshal(file, &abbreviations)
 
 	// Get standard book IDs.
 	file, err = ioutil.ReadFile("./data/names/default_names.json")
 	if err != nil {
-		logger.Log("err", "namefetcher", "failed to open default_names.json")
-		return err
+		return logger.LogWithError("namefetcher", "failed to open default_names.json", err)
 	}
 	json.Unmarshal(file, &defaultNames)
 
@@ -118,8 +135,7 @@ func FetchBookNames(apiBibleKey string, isDryRun bool, isTest bool) error {
 
 		if err != nil {
 			sp.Stop()
-			logger.Log("err", "namefetcher", "failed to remove completed_names.json, invalid permissions?")
-			return err
+			return logger.LogWithError("namefetcher", "failed to remove completed_names.json, invalid permissions?", err)
 		}
 	}
 
@@ -128,8 +144,7 @@ func FetchBookNames(apiBibleKey string, isDryRun bool, isTest bool) error {
 	resultFile, err := os.OpenFile("./data/names/completed_names.json", os.O_CREATE, os.ModePerm)
 	if err != nil {
 		sp.Stop()
-		logger.Log("err", "namefetcher", "failed to open completed_names.json")
-		return err
+		return logger.LogWithError("namefetcher", "failed to open completed_names.json", err)
 	}
 	defer resultFile.Close()
 
@@ -137,8 +152,7 @@ func FetchBookNames(apiBibleKey string, isDryRun bool, isTest bool) error {
 	err = jsonEncoder.Encode(completedNames)
 	if err != nil {
 		sp.Stop()
-		logger.Log("err", "namefetcher", "failed to write completed_names.json")
-		return err
+		return logger.LogWithError("namefetcher", "failed to write completed_names.json", err)
 	}
 
 	sp.FinalMSG = hiCyan("[info] ") + hiMagenta("<namefetcher> ") + "✔️  Name fetcher finished, wrote file successfully.\n"
@@ -155,20 +169,17 @@ func getBibleGatewayVersions(sp *spinner.Spinner) (map[string]string, error) {
 
 	resp, err := http.Get("https://www.biblegateway.com/versions/")
 	if err != nil {
-		logger.Log("err", "namefetcher", "couldn't reach biblegateway version list")
-		return nil, err
+		return nil, logger.LogWithError("namefetcher", "couldn't reach biblegateway version list", err)
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != 200 {
 		msg := fmt.Sprintf("biblegateway version list did not respond 200, got %d", resp.StatusCode)
-		logger.Log("err", "namefetcher", msg)
-		return nil, errors.New(msg)
+		return nil, logger.LogWithError("namefetcher", msg, err)
 	}
 
 	document, err := goquery.NewDocumentFromReader(resp.Body)
 	if err != nil {
-		logger.Log("err", "namefetcher", "couldn't read biblegateway version list")
-		return nil, err
+		return nil, logger.LogWithError("namefetcher", "couldn't read biblegateway version list", err)
 	}
 
 	document.Find(".translation-name").Each(func(index int, element *goquery.Selection) {
@@ -195,23 +206,20 @@ func getBibleGatewayNames(versions map[string]string, sp *spinner.Spinner) (map[
 		if err != nil {
 			sp.Stop()
 			msg := fmt.Sprintf("couldn't reach biblegateway version '%s'", versionName)
-			logger.Log("err", "namefetcher", msg)
-			return nil, err
+			return nil, logger.LogWithError("namefetcher", msg, err)
 		}
 		defer resp.Body.Close()
 		if resp.StatusCode != 200 {
 			sp.Stop()
 			msg := fmt.Sprintf("biblegateway version '%s' did not respond 200, got %d", versionName, resp.StatusCode)
-			logger.Log("err", "namefetcher", msg)
-			return nil, errors.New(msg)
+			return nil, logger.LogWithError("namefetcher", msg, err)
 		}
 
 		document, err := goquery.NewDocumentFromReader(resp.Body)
 		if err != nil {
 			sp.Stop()
 			msg := fmt.Sprintf("couldn't read biblegateway version '%s'", versionName)
-			logger.Log("err", "namefetcher", msg)
-			return nil, err
+			return nil, logger.LogWithError("namefetcher", msg, err)
 		}
 
 		document.Find(".book-name").Each(func(index int, element *goquery.Selection) {
@@ -225,20 +233,22 @@ func getBibleGatewayNames(versions map[string]string, sp *spinner.Spinner) (map[
 				dataName = string([]rune(dataName)[1 : len(dataName)-5])
 				bookName := strings.TrimSpace(element.Text())
 
-				if stringInSlice(dataName, []string{"3macc", "3m"}) {
+				if slices.StringInSlice(dataName, []string{"3macc", "3m"}) {
 					dataName = "3ma"
-				} else if stringInSlice(dataName, []string{"4macc", "4m"}) {
+				} else if slices.StringInSlice(dataName, []string{"4macc", "4m"}) {
 					dataName = "4ma"
-				} else if stringInSlice(dataName, []string{"gkesth", "adest", "addesth", "gkes"}) {
+				} else if slices.StringInSlice(dataName, []string{"gkesth", "adest", "addesth", "gkes"}) {
 					dataName = "gkest"
-				} else if stringInSlice(dataName, []string{"sgthree", "sgthr", "prazar"}) {
+				} else if slices.StringInSlice(dataName, []string{"sgthree", "sgthr", "prazar"}) {
 					dataName = "praz"
+				} else if dataName == "epjer" {
+					return
 				}
 
 				err := isNuisance(bookName)
 				if err == nil {
 					if val, ok := names[dataName]; ok {
-						if !stringInSlice(bookName, val) {
+						if !slices.StringInSlice(bookName, val) {
 							names[dataName] = append(names[dataName], bookName)
 						}
 					} else {
@@ -261,38 +271,33 @@ func getAPIBibleVersions(apiKey string, sp *spinner.Spinner) (map[string]string,
 	req, err := http.NewRequest("GET", "https://api.scripture.api.bible/v1/bibles", nil)
 	if err != nil {
 		sp.Stop()
-		logger.Log("err", "namefetcher", "failed to create request to API.Bible")
-		return nil, err
+		return nil, logger.LogWithError("namefetcher", "failed to create request to API.Bible", err)
 	}
 	req.Header.Add("api-key", apiKey)
 
 	resp, err := client.Do(req)
 	if err != nil {
 		sp.Stop()
-		logger.Log("err", "namefetcher", "couldn't reach API.Bible version list")
-		return nil, err
+		return nil, logger.LogWithError("namefetcher", "couldn't reach API.Bible version list", err)
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != 200 {
 		sp.Stop()
 		msg := fmt.Sprintf("API.Bible version list did not respond 200, got %d", resp.StatusCode)
-		logger.Log("err", "namefetcher", msg)
-		return nil, errors.New(msg)
+		return nil, logger.LogWithError("namefetcher", msg, err)
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		sp.Stop()
-		logger.Log("err", "namefetcher", "couldn't read API.Bible version list")
-		return nil, err
+		return nil, logger.LogWithError("namefetcher", "couldn't read API.Bible version list", err)
 	}
 
 	var abResp = new(ABBibleResponse)
 	err = json.Unmarshal(body, &abResp)
 	if err != nil {
 		sp.Stop()
-		logger.Log("err", "namefetcher", "failed to unmarshal API.Bible version list")
-		return nil, err
+		return nil, logger.LogWithError("namefetcher", "failed to unmarshal API.Bible version list", err)
 	}
 
 	for _, version := range abResp.Data {
@@ -314,8 +319,7 @@ func getAPIBibleNames(versions map[string]string, apiKey string, sp *spinner.Spi
 		if err != nil {
 			sp.Stop()
 			msg := fmt.Sprintf("failed to create request to API.Bible version '%s'", versionName)
-			logger.Log("err", "namefetcher", msg)
-			return nil, err
+			return nil, logger.LogWithError("namefetcher", msg, err)
 		}
 		req.Header.Add("api-key", apiKey)
 
@@ -323,23 +327,20 @@ func getAPIBibleNames(versions map[string]string, apiKey string, sp *spinner.Spi
 		if err != nil {
 			sp.Stop()
 			msg := fmt.Sprintf("couldn't reach API.Bible version '%s'", versionName)
-			logger.Log("err", "namefetcher", msg)
-			return nil, err
+			return nil, logger.LogWithError("namefetcher", msg, err)
 		}
 		defer resp.Body.Close()
 		if resp.StatusCode != 200 {
 			sp.Stop()
 			msg := fmt.Sprintf("API.Bible version '%s' did not respond 200, got %d", versionName, resp.StatusCode)
-			logger.Log("err", "namefetcher", msg)
-			return nil, errors.New(msg)
+			return nil, logger.LogWithError("namefetcher", msg, err)
 		}
 
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			sp.Stop()
 			msg := fmt.Sprintf("couldn't read API.Bible version '%s'", versionName)
-			logger.Log("err", "namefetcher", msg)
-			return nil, err
+			return nil, logger.LogWithError("namefetcher", msg, err)
 		}
 
 		var abResp = new(ABBookResponse)
@@ -347,8 +348,7 @@ func getAPIBibleNames(versions map[string]string, apiKey string, sp *spinner.Spi
 		if err != nil {
 			sp.Stop()
 			msg := fmt.Sprintf("failed to unmarshal API.Bible version '%s'", versionName)
-			logger.Log("err", "namefetcher", msg)
-			return nil, err
+			return nil, logger.LogWithError("namefetcher", msg, err)
 		}
 
 		for _, book := range abResp.Data {
@@ -363,14 +363,15 @@ func getAPIBibleNames(versions map[string]string, apiKey string, sp *spinner.Spi
 			name = strings.TrimSpace(name)
 			id := apiBibleNames[trueID]
 
-			if (id == "1sam" && name == "1 Kings") || (id == "2sam" && name == "2 Kings") || stringInSlice(abbv, []string{"3 Kings", "4 Kings"}) {
+			if (id == "1sam" && name == "1 Kings") || (id == "2sam" && name == "2 Kings") ||
+				slices.StringInSlice(abbv, []string{"3 Kings", "4 Kings"}) || (id == "lje") {
 				continue
 			}
 
 			err := isNuisance(name)
 			if err == nil {
 				if val, ok := names[id]; ok {
-					if !stringInSlice(name, val) {
+					if !slices.StringInSlice(name, val) {
 						names[id] = append(names[id], name)
 					}
 				} else {
@@ -381,7 +382,7 @@ func getAPIBibleNames(versions map[string]string, apiKey string, sp *spinner.Spi
 			err = isNuisance(abbv)
 			if err == nil {
 				if val, ok := names[id]; ok {
-					if !stringInSlice(abbv, val) {
+					if !slices.StringInSlice(abbv, val) {
 						names[id] = append(names[id], abbv)
 					}
 				} else {
@@ -397,15 +398,14 @@ func getAPIBibleNames(versions map[string]string, apiKey string, sp *spinner.Spi
 func isNuisance(word string) error {
 	file, err := ioutil.ReadFile("./data/names/nuisances.json")
 	if err != nil {
-		logger.Log("err", "namefetcher", "failed to open nuisances.json")
-		return err
+		return logger.LogWithError("namefetcher", "failed to open nuisances.json", err)
 	}
 	json.Unmarshal(file, &nuisances)
 
 	word = strings.ToLower(word)
 	abbreviated := fmt.Sprintf("%s.", word)
 
-	if stringInSlice(word, nuisances) || stringInSlice(abbreviated, nuisances) {
+	if slices.StringInSlice(word, nuisances) || slices.StringInSlice(abbreviated, nuisances) {
 		return errors.New("word is nuisance")
 	}
 
@@ -416,35 +416,26 @@ type m = map[string][]string
 
 func mergeThreeMaps(a m, b m, c m) m {
 	for k := range a {
-		if !stringInSlice(k, defaultNames) {
-			logger.Log("err", "namefetcher", fmt.Sprintf("'%s' not in default names", k))
+		if !slices.StringInSlice(k, defaultNames) {
+			logger.LogWithError("namefetcher", fmt.Sprintf("'%s' not in default names", k), nil)
 		}
 	}
 
 	for k, v := range b {
-		if !stringInSlice(k, defaultNames) {
-			logger.Log("err", "namefetcher", fmt.Sprintf("'%s' not in default names", k))
+		if !slices.StringInSlice(k, defaultNames) {
+			logger.LogWithError("namefetcher", fmt.Sprintf("'%s' not in default names", k), nil)
 		}
 
 		a[k] = append(a[k], v...)
 	}
 
 	for k, v := range c {
-		if !stringInSlice(k, defaultNames) {
-			logger.Log("err", "namefetcher", fmt.Sprintf("'%s' not in default names", k))
+		if !slices.StringInSlice(k, defaultNames) {
+			logger.LogWithError("namefetcher", fmt.Sprintf("'%s' not in default names", k), nil)
 		}
 
 		a[k] = append(a[k], v...)
 	}
 
 	return a
-}
-
-func stringInSlice(a string, list []string) bool {
-	for _, b := range list {
-		if b == a {
-			return true
-		}
-	}
-	return false
 }

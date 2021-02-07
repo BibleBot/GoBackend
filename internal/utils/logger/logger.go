@@ -9,8 +9,7 @@ import (
 	"github.com/fatih/color"
 )
 
-// Log messages to console.
-func Log(level string, source string, msg string) error {
+func log(level string, source string, msg string) error {
 	if level == "err" {
 		level = "erro"
 	}
@@ -42,4 +41,25 @@ func Log(level string, source string, msg string) error {
 	msgColor.Println(msg)
 
 	return nil
+}
+
+// LogInfo wraps log() in reporting a standard informational message.
+func LogInfo(source string, message string) error {
+	return log("info", source, message)
+}
+
+// LogWarn wraps log() in reporting a standard warning message.
+func LogWarn(source string, message string) error {
+	return log("warn", source, message)
+}
+
+// LogWithError wraps log() in reporting a standard error message and returning the error.
+func LogWithError(source string, msg string, err error) error {
+	log("err", source, msg)
+
+	if err != nil {
+		return errors.New(msg)
+	}
+
+	return err
 }

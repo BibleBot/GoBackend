@@ -15,8 +15,7 @@ import (
 func ExtractData(inputPath string, password string) error {
 	inputFile, err := ioutil.ReadFile(inputPath)
 	if err != nil {
-		logger.Log("err", "extractdata@read", err.Error())
-		return err
+		return logger.LogWithError("extractdata@read", err.Error(), err)
 	}
 
 	var bytesReader io.Reader
@@ -25,8 +24,7 @@ func ExtractData(inputPath string, password string) error {
 		decryptionKey := []byte(password)
 		decryptedData, err := decryption.Decrypt(inputFile, decryptionKey, nil)
 		if err != nil {
-			logger.Log("err", "extractdata@decrypt", err.Error())
-			return err
+			return logger.LogWithError("extractdata@decrypt", err.Error(), err)
 		}
 
 		bytesReader = bytes.NewReader(decryptedData)

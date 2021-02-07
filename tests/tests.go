@@ -9,6 +9,7 @@ import (
 
 	"path/filepath"
 
+	"github.com/BibleBot/backend/internal/models"
 	"github.com/BibleBot/backend/internal/routes/commands"
 	"github.com/BibleBot/backend/internal/routes/verses"
 	"github.com/BibleBot/backend/internal/utils/extractdata"
@@ -52,26 +53,26 @@ func SetupApp() *fiber.App {
 
 	// Cables need not apply.
 	commands.RegisterRouter(app)
-	verses.RegisterRouter(app)
+	verses.RegisterRouter(app, config)
 
 	return app
 }
 
-func readConfig() *Config {
-	config := Config{}
+func readConfig() *models.Config {
+	var config models.Config
 
-	file, err := ioutil.ReadFile("./config.test.yml")
+	file, err := ioutil.ReadFile("./config.yml")
 	if os.IsNotExist(err) {
-		logger.Log("err", "config", "config.test.yml does not exist")
+		logger.LogWithError("config", "config.yml does not exist", err)
 		os.Exit(1)
 	} else if err != nil {
-		logger.Log("err", "config", err.Error())
+		logger.LogWithError("config", err.Error(), err)
 		os.Exit(1)
 	}
 
 	err = yaml.Unmarshal(file, &config)
 	if err != nil {
-		logger.Log("err", "config", err.Error())
+		logger.LogWithError("config", err.Error(), err)
 		os.Exit(1)
 	}
 
@@ -80,7 +81,7 @@ func readConfig() *Config {
 
 // This is a wrapper for internal/utils/extractdata.
 // We're using the same name just to make logging more uniform.
-func extractData(config *Config) error {
+func extractData(config *models.Config) error {
 	var absInputs []string
 
 	for _, file := range config.EncryptedFiles {

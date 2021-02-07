@@ -27,14 +27,12 @@ func Decrypt(ciphertext []byte, password []byte, packetConfig *packet.Config) ([
 
 	md, err := openpgp.ReadMessage(decbuf, nil, prompt, packetConfig)
 	if err != nil {
-		logger.Log("err", "decrypt@read", "failed to read buffer")
-		return nil, err
+		return nil, logger.LogWithError("decrypt@read", "failed to read buffer", err)
 	}
 
 	plaintext, err := ioutil.ReadAll(md.UnverifiedBody)
 	if err != nil {
-		logger.Log("err", "decrypt@read", "failed to convert buffer to plaintext")
-		return nil, err
+		return nil, logger.LogWithError("decrypt@read", "failed to convert buffer to plaintext", err)
 	}
 
 	return plaintext, nil
