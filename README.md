@@ -10,9 +10,6 @@
     <a href="https://github.com/BibleBot/backend/actions?query=workflow%3Atests">
         <img alt="GitHub Test Status" src="https://github.com/BibleBot/backend/workflows/tests/badge.svg">
     </a>
-    <a href="https://deepsource.io/gh/BibleBot/backend/?ref=repository-badge">
-        <img alt="DeepSource" src="https://deepsource.io/gh/BibleBot/backend.svg/?label=active+issues">
-    </a>
     <a href="https://github.com/BibleBot/backend/actions?query=workflow%3A%22docker+%28prod%29%22">
         <img alt="GitHub Workflow Status" src="https://github.com/BibleBot/backend/workflows/docker%20(prod)/badge.svg">
     </a>
@@ -28,6 +25,10 @@
     </a>
     <a href="https://github.com/BibleBot/backend/blob/master/LICENSE.txt">
         <img alt="MPL-2.0" src="https://img.shields.io/github/license/BibleBot/backend">
+    </a>
+    <br>
+    <a href="https://deepsource.io/gh/BibleBot/backend/?ref=repository-badge">
+        <img alt="DeepSource" src="https://deepsource.io/gh/BibleBot/backend.svg/?label=active+issues">
     </a>
 
 </p>
