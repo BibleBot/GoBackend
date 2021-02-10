@@ -3,12 +3,10 @@ package verses
 // Parse message with parsing.go, then generate a reference here and process it.
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/BibleBot/backend/internal/models"
 	"github.com/BibleBot/backend/internal/utils/converters"
-	"github.com/BibleBot/backend/internal/utils/logger"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -33,14 +31,18 @@ func fetchVerse(c *fiber.Ctx) error {
 		return err
 	}
 
-	str, results := FindBooksInString(query.Body)
-	result, err := json.Marshal(results)
-	if err != nil {
-		return logger.LogWithError("verses@fetchVerse", "unable to convert result to json", nil)
+	str, bookSearchResults := FindBooksInString(query.Body)
+
+	for _, bsr := range bookSearchResults {
+		reference := GenerateReference(str, bsr, models.Version{})
+		if reference == nil {
+			continue
+		}
+
+		fmt.Println(reference.ToString())
 	}
-	fmt.Println(str)
-	fmt.Println(string(result))
-	return c.SendString(string(result))
+
+	return c.SendString("")
 }
 
 func processInput(input []byte) (*models.Query, error) {

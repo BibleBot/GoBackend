@@ -2,156 +2,200 @@ package verses
 
 import (
 	"fmt"
+	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/BibleBot/backend/internal/models"
+	"github.com/BibleBot/backend/internal/utils/bookmap"
 	"github.com/BibleBot/backend/internal/utils/namefetcher"
-	"github.com/BibleBot/backend/internal/utils/slices"
 )
 
 // FindBooksInString locates a book name within a string, accounting for other parameters.
 func FindBooksInString(str string) (string, []models.BookSearchResult) {
-	str = strings.Replace(str, "Letter of Jeremiah", "epjer", 1)
-
-	tokens := strings.Split(str, " ")
 	books := namefetcher.GetBookNames(false)
+	defaultBooks := namefetcher.GetDefaultBookNames(false)
 
 	var results []models.BookSearchResult
-	var existingIndices []int
 
 	for bookKey, valueArray := range books {
 		for _, item := range valueArray {
 			potentialValues := []string{strings.ToUpper(item), strings.ToLower(item), strings.ToTitle(item), item}
 
 			for _, value := range potentialValues {
-				for range tokens {
-					if isTokenInString(value, str) {
-						fmt.Printf("'%s' contains '%s'\n", str, value)
-						overlappedNames := map[string][]string{
-							"john": append(books["1john"], append(books["2john"], books["3john"]...)...),
-							"ezra": append(books["1esd"], books["2esd"]...),
-							"song": books["song"],
-							"ps":   books["ps151"],
-						}
-
-						lastItem := strings.Split(value, " ")[len(strings.Split(value, " "))-1]
-						potentialLastItems := []string{strings.ToUpper(lastItem), strings.ToLower(lastItem), strings.ToTitle(lastItem), lastItem}
-						potentialIndices := slices.MapSlice(tokens, func(val string, mapIdx int) int {
-							if slices.Index(potentialLastItems, val) != -1 {
-								return mapIdx
-							}
-
-							return -1
-						})
-
-						_, potentialOverlapKey := overlappedNames[bookKey]
-						isOverlappingBook := slices.Any(overlappedNames[bookKey], func(val string) bool {
-							return isTokenInString(val, str)
-						})
-
-						if potentialOverlapKey && isOverlappingBook {
-							for _, idx := range potentialIndices {
-								if idx == -1 {
-									continue
-								}
-
-								var bookName string
-
-								switch bookKey {
-								case "ps":
-									bookName = fmt.Sprintf("%s %s", tokens[idx], tokens[idx+1])
-									break
-								case "song":
-									bookName = fmt.Sprintf("%s %s %s", tokens[idx-2], tokens[idx-1], tokens[idx])
-									break
-								default:
-									bookName = fmt.Sprintf("%s %s", tokens[idx-1], tokens[idx])
-									break
-								}
-
-								if slices.StringInSlice(bookName, overlappedNames[bookKey]) {
-									for key, value := range books {
-										if slices.StringInSlice(bookName, value) {
-											str = strings.Replace(str, bookName, key, 1)
-											tempTokens := strings.Split(str, " ")
-
-											results = append(results, models.BookSearchResult{
-												Name:  key,
-												Index: slices.Index(tempTokens, key),
-											})
-
-											existingIndices = append(existingIndices, idx)
-											str = strings.Replace(str, key, "nil", 1)
-										}
-									}
-
-								}
-							}
-						} else {
-							for _, idx := range potentialIndices {
-								if idx == -1 {
-									continue
-								}
-
-								if !slices.IntInSlice(idx, existingIndices) {
-									str = strings.Replace(str, value, bookKey, 1)
-									tempTokens := strings.Split(str, " ")
-
-									results = append(results, models.BookSearchResult{
-										Name:  bookKey,
-										Index: slices.Index(tempTokens, bookKey),
-									})
-
-									existingIndices = append(existingIndices, idx)
-									str = strings.Replace(str, bookKey, "nil", 1)
-									break
-								}
-							}
-						}
-					}
+				if isValueInString(value, str) {
+					str = strings.Replace(str, value, bookKey, -1)
 				}
 			}
 		}
 	}
 
-	tempTokens := strings.Split(str, " ")
-	for idx, token := range tempTokens {
-		if token == "epnil" {
-			tempTokens[slices.Index(tempTokens, "epnil")] = "epjer"
-
-			results = append(results, models.BookSearchResult{
-				Name:  "epjer",
-				Index: idx,
-			})
-		} else if token == "epjer" {
-			results = append(results, models.BookSearchResult{
-				Name:  "epjer",
-				Index: idx,
-			})
-		}
-
-		for _, result := range results {
-			if idx == result.Index && token == "nil" {
-				tempTokens[slices.Index(tempTokens, "nil")] = result.Name
+	tokens := strings.Split(str, " ")
+	for _, book := range defaultBooks {
+		for idx, token := range tokens {
+			if token == book {
+				results = append(results, models.BookSearchResult{
+					Name:  book,
+					Index: idx,
+				})
 			}
 		}
 	}
-	str = strings.Join(tempTokens, " ")
-
-	// Remove duplicates and invalid results.
-	filteredResults := slices.RemoveBSRDuplicates(slices.FilterBSR(results, func(bsr models.BookSearchResult) bool {
-		return bsr.Index > -1
-	}))
 
 	// Sort output to match input order.
-	sort.SliceStable(filteredResults, func(i, j int) bool {
-		return filteredResults[i].Index < filteredResults[j].Index
+	sort.SliceStable(results, func(i, j int) bool {
+		return results[i].Index < results[j].Index
 	})
 
-	return str, filteredResults
+	return str, results
 }
 
-func isTokenInString(token string, str string) bool {
-	return strings.Contains(fmt.Sprintf(" %s ", str), fmt.Sprintf(" %s ", token))
+// GenerateReference creates a reference object based on a BookSearchResult and the surrounding values in a string.
+func GenerateReference(str string, bookSearchResult models.BookSearchResult, version models.Version) *models.Reference {
+	book := bookSearchResult.Name
+	startingChapter := 0
+	startingVerse := 0
+	endingChapter := 0
+	endingVerse := 0
+	//tokenIdxAfterSpan := 0
+
+	tokens := strings.Split(str, " ")
+
+	if bookSearchResult.Index+2 <= len(tokens) {
+		relevantToken := tokens[bookSearchResult.Index+1:][0]
+
+		if strings.Contains(relevantToken, ":") {
+			//tokenIdxAfterSpan = bookSearchResult.Index + 2
+
+			colonRegex, _ := regexp.Compile(":")
+			colonQuantity := len(colonRegex.FindAllStringIndex(relevantToken, -1))
+
+			switch colonQuantity {
+			case 2:
+				span := strings.Split(relevantToken, "-")
+
+				for _, pairString := range span {
+					pair := strings.Split(pairString, ":")
+
+					for idx, pairValue := range pair {
+						pair[idx] = removePunctuation(pairValue)
+					}
+
+					firstNum, firstErr := strconv.Atoi(pair[0])
+					secondNum, secondErr := strconv.Atoi(pair[1])
+
+					if firstErr != nil || secondErr != nil {
+						return nil
+					}
+
+					if startingChapter == 0 {
+						startingChapter = firstNum
+						startingVerse = secondNum
+					} else {
+						endingChapter = firstNum
+						endingVerse = secondNum
+					}
+				}
+
+				break
+			case 1:
+				pair := strings.Split(relevantToken, ":")
+
+				num, err := strconv.Atoi(pair[0])
+				if err != nil {
+					return nil
+				}
+
+				startingChapter = num
+				endingChapter = num
+
+				spanRegex, _ := regexp.Compile("-")
+				spanQuantity := len(spanRegex.FindStringSubmatchIndex(relevantToken))
+
+				span := strings.Split(pair[1], "-")
+				for idx, pairValue := range span {
+					pairValue = removePunctuation(pairValue)
+
+					num, err := strconv.Atoi(pairValue)
+					if err != nil {
+						// Instead of returning nil, we'll break out of the loop
+						// in the event that the span exists to extend to the end of a chapter.
+						break
+					}
+
+					switch idx {
+					case 0:
+						startingVerse = num
+						break
+					case 1:
+						endingVerse = num
+						break
+					default:
+						return nil
+					}
+				}
+
+				if endingVerse == 0 && spanQuantity == 0 {
+					endingVerse = startingVerse
+				}
+
+				break
+			}
+
+			// TODO: This after DBs implemented.
+			/*if len(tokens) > tokenIdxAfterSpan {
+				lastToken = strings.ToUpper(tokens[tokenIdxAfterSpan])
+				// if version exists corresponding to lastToken, use that instead
+			}*/
+		}
+	} else {
+		return nil
+	}
+
+	isOT := false
+	isNT := false
+	isDEU := false
+
+	bookmapping := bookmap.GetBookmap(false)
+	if correctBook, ok := bookmapping["ot"][book]; ok {
+		isOT = true
+		book = correctBook
+	} else if correctBook, ok := bookmapping["nt"][book]; ok {
+		isNT = true
+		book = correctBook
+	} else if correctBook, ok := bookmapping["deu"][book]; ok {
+		isDEU = true
+		book = correctBook
+	}
+
+	if startingChapter == 0 || startingVerse == 0 {
+		return nil
+	}
+
+	return &models.Reference{
+		Book:            book,
+		StartingChapter: startingChapter,
+		StartingVerse:   startingVerse,
+		EndingChapter:   endingChapter,
+		EndingVerse:     endingVerse,
+		Version:         version,
+
+		IsOT:  isOT,
+		IsNT:  isNT,
+		IsDEU: isDEU,
+	}
+}
+
+// -- helper functions --
+
+func isValueInString(value string, str string) bool {
+	return strings.Contains(fmt.Sprintf(" %s ", str), fmt.Sprintf(" %s ", value))
+}
+
+func removePunctuation(str string) string {
+	noPunctuationRegex, _ := regexp.Compile("[^\\w\\s]|_")
+	minimizeWhitespaceRegex, _ := regexp.Compile("\\s+")
+
+	return minimizeWhitespaceRegex.ReplaceAllString(noPunctuationRegex.ReplaceAllString(str, ""), " ")
 }
