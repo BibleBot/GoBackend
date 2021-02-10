@@ -119,9 +119,11 @@ func GenerateReference(str string, bookSearchResult models.BookSearchResult, ver
 
 					num, err := strconv.Atoi(pairValue)
 					if err != nil {
-						// Instead of returning nil, we'll break out of the loop
-						// in the event that the span exists to extend to the end of a chapter.
-						break
+						if version.Source == "bg" {
+							// Instead of returning nil, we'll break out of the loop
+							// in the event that the span exists to extend to the end of a chapter.
+							break
+						}
 					}
 
 					switch idx {
