@@ -1,19 +1,6 @@
 <div align="center"><p>
 <a alt="Backend" href="https://biblebot.xyz"><img alt="Backend" width="400px" src="https://i.imgur.com/JVBY24z.png"></a>
-<br><br>
-<a href="https://github.com/BibleBot/backend/actions?query=workflow%3A%22docker+%28dev%29%22"><img alt="GitHub Workflow Status" src="https://github.com/BibleBot/backend/workflows/docker%20(dev)/badge.svg"></a>
-<a href="https://github.com/BibleBot/backend/actions?query=workflow%3Atests"><img alt="GitHub Test Status" src="https://github.com/BibleBot/backend/workflows/tests/badge.svg"></a>
-<a href="https://github.com/BibleBot/backend/actions?query=workflow%3A%22docker+%28prod%29%22"><img alt="GitHub Workflow Status" src="https://github.com/BibleBot/backend/workflows/docker%20(prod)/badge.svg"></a>
-<br>
-<a href="https://github.com/BibleBot/backend/blob/master/go.mod"><img alt="GitHub go.mod Go version" src="https://img.shields.io/github/go-mod/go-version/BibleBot/backend?label=go"></a>
-<a alt="Go Report Card" href="https://goreportcard.com/report/github.com/BibleBot/backend"><img alt="Go Report Card" src="https://goreportcard.com/badge/github.com/biblebot/backend"></a>
-<a alt="Discord" href="https://discord.gg/H7ZyHqE"><img alt="Discord" src="https://img.shields.io/discord/362503610006765568?label=discord"></a>
-<a href="https://github.com/BibleBot/backend/blob/master/LICENSE.txt"><img alt="MPL-2.0" src="https://img.shields.io/github/license/BibleBot/backend"></a>
-<br>
-<a href="https://deepsource.io/gh/BibleBot/backend/?ref=repository-badge"><img alt="DeepSource" src="https://deepsource.io/gh/BibleBot/backend.svg/?label=active+issues"></a>
-</p></div>
-
-<div align="center"><p>
+</p><p>
 The Backend API for BibleBot.
 </p></div>
 
