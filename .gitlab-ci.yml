@@ -9,11 +9,11 @@ stages:
     - push
     - test
 
-build dev:
-    image: docker:18
+build:dev:
+    image: docker:20
     stage: build
     script:
-      - docker pull $CI_REGISTRY_IMAGE:dev-master || true
+      - docker pull $CI_REGISTRY_IMAGE:dev-latest || true
       - >
         docker build
         --pull
@@ -22,11 +22,11 @@ build dev:
         .
       - docker push $CI_REGISTRY_IMAGE:dev-$CI_COMMIT_SHA
 
-build prod:
-    image: docker:18
+build:prod:
+    image: docker:20
     stage: build
     script:
-        - docker pull $CI_REGISTRY_IMAGE:prod-master || true
+        - docker pull $CI_REGISTRY_IMAGE:prod-latest || true
         - >
           docker build
           --pull
@@ -36,8 +36,9 @@ build prod:
           .
         - docker push $CI_REGISTRY_IMAGE:prod-$CI_COMMIT_SHA
 
-push dev master:
-    image: docker:18
+push:dev:latest:
+    needs: ["build:dev"]
+    image: docker:20
     stage: push
     variables:
         GIT_STRATEGY: none
@@ -45,11 +46,12 @@ push dev master:
         - master
     script:
         - docker pull $CI_REGISTRY_IMAGE:dev-$CI_COMMIT_SHA
-        - docker tag $CI_REGISTRY_IMAGE:dev-$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:dev-master
-        - docker push $CI_REGISTRY_IMAGE:dev-master
+        - docker tag $CI_REGISTRY_IMAGE:dev-$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:dev-latest
+        - docker push $CI_REGISTRY_IMAGE:dev-latest
 
-push prod master:
-    image: docker:18
+push:prod:latest:
+    needs: ["build:prod"]
+    image: docker:20
     stage: push
     variables:
         GIT_STRATEGY: none
@@ -57,11 +59,12 @@ push prod master:
         - master
     script:
         - docker pull $CI_REGISTRY_IMAGE:prod-$CI_COMMIT_SHA
-        - docker tag $CI_REGISTRY_IMAGE:prod-$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:prod-master
-        - docker push $CI_REGISTRY_IMAGE:prod-master
+        - docker tag $CI_REGISTRY_IMAGE:prod-$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:prod-latest
+        - docker push $CI_REGISTRY_IMAGE:prod-latest
 
-push dev tag:
-    image: docker:18
+push:dev:tag:
+    needs: ["build:dev"]
+    image: docker:20
     stage: push
     variables:
         GIT_STRATEGY: none
@@ -72,8 +75,9 @@ push dev tag:
         - docker tag $CI_REGISTRY_IMAGE:dev-$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:dev-$CI_COMMIT_REF_NAME
         - docker push $CI_REGISTRY_IMAGE:dev-$CI_COMMIT_REF_NAME
 
-push prod tag:
-    image: docker:18
+push:prod:tag:
+    needs: ["build:prod"]
+    image: docker:20
     stage: push
     variables:
         GIT_STRATEGY: none
