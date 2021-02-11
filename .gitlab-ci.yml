@@ -1,0 +1,93 @@
+variables:
+    REPO_NAME: internal.kerygma.digital/kerygma-digital/biblebot/backend
+
+before_script:
+    - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
+
+stages:
+    - build
+    - push
+    - test
+
+build dev:
+    image: docker:18
+    stage: build
+    script:
+      - docker pull $CI_REGISTRY_IMAGE:dev-master || true
+      - >
+        docker build
+        --pull
+        --file Dockerfile
+        --tag $CI_REGISTRY_IMAGE:dev-$CI_COMMIT_SHA
+        .
+      - docker push $CI_REGISTRY_IMAGE:dev-$CI_COMMIT_SHA
+
+build prod:
+    image: docker:18
+    stage: build
+    script:
+        - docker pull $CI_REGISTRY_IMAGE:prod-master || true
+        - >
+          docker build
+          --pull
+          --file Dockerfile
+          --build-arg DOMAIN=api.biblebot.xyz
+          --tag $CI_REGISTRY_IMAGE:prod-$CI_COMMIT_SHA
+          .
+        - docker push $CI_REGISTRY_IMAGE:prod-$CI_COMMIT_SHA
+
+push dev master:
+    image: docker:18
+    stage: push
+    variables:
+        GIT_STRATEGY: none
+    only:
+        - master
+    script:
+        - docker pull $CI_REGISTRY_IMAGE:dev-$CI_COMMIT_SHA
+        - docker tag $CI_REGISTRY_IMAGE:dev-$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:dev-master
+        - docker push $CI_REGISTRY_IMAGE:dev-master
+
+push prod master:
+    image: docker:18
+    stage: push
+    variables:
+        GIT_STRATEGY: none
+    only:
+        - master
+    script:
+        - docker pull $CI_REGISTRY_IMAGE:prod-$CI_COMMIT_SHA
+        - docker tag $CI_REGISTRY_IMAGE:prod-$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:prod-master
+        - docker push $CI_REGISTRY_IMAGE:prod-master
+
+push dev tag:
+    image: docker:18
+    stage: push
+    variables:
+        GIT_STRATEGY: none
+    only:
+        - tags
+    script:
+        - docker pull $CI_REGISTRY_IMAGE:dev-$CI_COMMIT_SHA
+        - docker tag $CI_REGISTRY_IMAGE:dev-$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:dev-$CI_COMMIT_REF_NAME
+        - docker push $CI_REGISTRY_IMAGE:dev-$CI_COMMIT_REF_NAME
+
+push prod tag:
+    image: docker:18
+    stage: push
+    variables:
+        GIT_STRATEGY: none
+    only:
+        - tags
+    script:
+        - docker pull $CI_REGISTRY_IMAGE:prod-$CI_COMMIT_SHA
+        - docker tag $CI_REGISTRY_IMAGE:prod-$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:prod-$CI_COMMIT_REF_NAME
+        - docker push $CI_REGISTRY_IMAGE:prod-$CI_COMMIT_REF_NAME
+
+test:
+    image: golang:1.15
+    stage: test
+    script:
+        - go fmt $(go list ./... | grep -v /vendor/)
+        - go vet $(go list ./... | grep -v /vendor/)
+        - cd tests && go test -v ./...
