@@ -13,53 +13,25 @@ build:dev:
     image: docker:20
     stage: build
     script:
-      - docker pull $CI_REGISTRY_IMAGE:dev-latest || true
       - >
         docker build
         --pull
         --file Dockerfile
-        --tag $CI_REGISTRY_IMAGE:dev-$CI_COMMIT_SHA
+        --tag $CI_REGISTRY_IMAGE:dev-latest
         .
-      - docker push $CI_REGISTRY_IMAGE:dev-$CI_COMMIT_SHA
+      - docker push $CI_REGISTRY_IMAGE:dev-latest
 
 build:prod:
     image: docker:20
     stage: build
     script:
-        - docker pull $CI_REGISTRY_IMAGE:prod-latest || true
         - >
           docker build
           --pull
           --file Dockerfile
           --build-arg DOMAIN=api.biblebot.xyz
-          --tag $CI_REGISTRY_IMAGE:prod-$CI_COMMIT_SHA
+          --tag $CI_REGISTRY_IMAGE:prod-latest
           .
-        - docker push $CI_REGISTRY_IMAGE:prod-$CI_COMMIT_SHA
-
-push:dev:latest:
-    needs: ["build:dev"]
-    image: docker:20
-    stage: push
-    variables:
-        GIT_STRATEGY: none
-    only:
-        - master
-    script:
-        - docker pull $CI_REGISTRY_IMAGE:dev-$CI_COMMIT_SHA
-        - docker tag $CI_REGISTRY_IMAGE:dev-$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:dev-latest
-        - docker push $CI_REGISTRY_IMAGE:dev-latest
-
-push:prod:latest:
-    needs: ["build:prod"]
-    image: docker:20
-    stage: push
-    variables:
-        GIT_STRATEGY: none
-    only:
-        - master
-    script:
-        - docker pull $CI_REGISTRY_IMAGE:prod-$CI_COMMIT_SHA
-        - docker tag $CI_REGISTRY_IMAGE:prod-$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:prod-latest
         - docker push $CI_REGISTRY_IMAGE:prod-latest
 
 push:dev:tag:
@@ -71,8 +43,8 @@ push:dev:tag:
     only:
         - tags
     script:
-        - docker pull $CI_REGISTRY_IMAGE:dev-$CI_COMMIT_SHA
-        - docker tag $CI_REGISTRY_IMAGE:dev-$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:dev-$CI_COMMIT_REF_NAME
+        - docker pull $CI_REGISTRY_IMAGE:dev-latest
+        - docker tag $CI_REGISTRY_IMAGE:dev-latest $CI_REGISTRY_IMAGE:dev-$CI_COMMIT_REF_NAME
         - docker push $CI_REGISTRY_IMAGE:dev-$CI_COMMIT_REF_NAME
 
 push:prod:tag:
@@ -84,8 +56,8 @@ push:prod:tag:
     only:
         - tags
     script:
-        - docker pull $CI_REGISTRY_IMAGE:prod-$CI_COMMIT_SHA
-        - docker tag $CI_REGISTRY_IMAGE:prod-$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:prod-$CI_COMMIT_REF_NAME
+        - docker pull $CI_REGISTRY_IMAGE:prod-latest
+        - docker tag $CI_REGISTRY_IMAGE:prod-latest $CI_REGISTRY_IMAGE:prod-$CI_COMMIT_REF_NAME
         - docker push $CI_REGISTRY_IMAGE:prod-$CI_COMMIT_REF_NAME
 
 test:
