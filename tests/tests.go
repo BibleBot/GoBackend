@@ -61,9 +61,9 @@ func SetupApp() *fiber.App {
 func readConfig() *models.Config {
 	var config models.Config
 
-	file, err := ioutil.ReadFile("./config.yml")
+	file, err := ioutil.ReadFile("./config.test.yml")
 	if os.IsNotExist(err) {
-		logger.LogWithError("config", "config.yml does not exist", err)
+		logger.LogWithError("config", "config.test.yml does not exist", err)
 		os.Exit(1)
 	} else if err != nil {
 		logger.LogWithError("config", err.Error(), err)
