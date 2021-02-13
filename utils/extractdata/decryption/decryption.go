@@ -5,7 +5,7 @@ import (
 	"errors"
 	"io/ioutil"
 
-	"github.com/BibleBot/backend/internal/utils/logger"
+	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/logger"
 
 	"golang.org/x/crypto/openpgp"
 	"golang.org/x/crypto/openpgp/packet"

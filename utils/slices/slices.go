@@ -1,6 +1,6 @@
 package slices
 
-import "github.com/BibleBot/backend/internal/models"
+import "internal.kerygma.digital/kerygma-digital/biblebot/backend/models"
 
 // Index finds index of string in []string, otherwise returns -1
 func Index(vs []string, t string) int {

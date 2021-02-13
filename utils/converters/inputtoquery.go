@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/BibleBot/backend/internal/models"
-	"github.com/BibleBot/backend/internal/utils/logger"
+	"internal.kerygma.digital/kerygma-digital/biblebot/backend/models"
+	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/logger"
 )
 
 // InputToQuery takes a byte slice and attempts to convert it to a Query model.

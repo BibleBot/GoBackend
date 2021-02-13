@@ -6,9 +6,9 @@ import (
 	"io/ioutil"
 	"strings"
 
-	"github.com/BibleBot/backend/internal/utils/extractdata/decompression"
-	"github.com/BibleBot/backend/internal/utils/extractdata/decryption"
-	"github.com/BibleBot/backend/internal/utils/logger"
+	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/extractdata/decompression"
+	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/extractdata/decryption"
+	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/logger"
 )
 
 // ExtractData extracts *.tar.zst and *.tar.zst.gpg files.

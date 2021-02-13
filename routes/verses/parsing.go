@@ -7,9 +7,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/BibleBot/backend/internal/models"
-	"github.com/BibleBot/backend/internal/utils/bookmap"
-	"github.com/BibleBot/backend/internal/utils/namefetcher"
+	"internal.kerygma.digital/kerygma-digital/biblebot/backend/models"
+	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/bookmap"
+	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/namefetcher"
 )
 
 // FindBooksInString locates a book name within a string, accounting for other parameters.

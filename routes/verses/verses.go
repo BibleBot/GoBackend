@@ -5,9 +5,9 @@ package verses
 import (
 	"fmt"
 
-	"github.com/BibleBot/backend/internal/models"
-	"github.com/BibleBot/backend/internal/utils/converters"
 	"github.com/gofiber/fiber/v2"
+	"internal.kerygma.digital/kerygma-digital/biblebot/backend/models"
+	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/converters"
 )
 
 var _config *models.Config

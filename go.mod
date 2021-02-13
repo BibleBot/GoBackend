@@ -1,4 +1,4 @@
-module github.com/BibleBot/backend
+module internal.kerygma.digital/kerygma-digital/biblebot/backend
 
 go 1.15
 

@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/BibleBot/backend/internal/utils/logger"
+	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/logger"
 )
 
 // GetBookmap returns the JSON object defined in data/names/book_map.json

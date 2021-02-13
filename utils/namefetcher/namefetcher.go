@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/BibleBot/backend/internal/utils/logger"
-	"github.com/BibleBot/backend/internal/utils/slices"
+	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/logger"
+	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/slices"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/briandowns/spinner"

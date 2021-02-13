@@ -4,10 +4,6 @@
 The Backend API for BibleBot.
 </p></div>
 
-## Internal Organization
-
-While the backend repository itself is a monolith, multiple packages will exist in `internal/` that all hook into the base API. These packages are internal, since they'd be pretty useless on their own.
-
 ## Prerequisites
 
 - Go v1.15
@@ -15,7 +11,7 @@ While the backend repository itself is a monolith, multiple packages will exist 
 
 ## Self-Host Setup
 ```bash
-git clone https://github.com/BibleBot/backend && cd backend
+git clone https://internal.kerygma.digital/kerygma-digital/biblebot/backend && cd backend
 cp config.example.yml && $EDITOR config.yml
 
 # build production container

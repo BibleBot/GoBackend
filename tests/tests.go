@@ -9,12 +9,12 @@ import (
 
 	"path/filepath"
 
-	"github.com/BibleBot/backend/internal/models"
-	"github.com/BibleBot/backend/internal/routes/commands"
-	"github.com/BibleBot/backend/internal/routes/verses"
-	"github.com/BibleBot/backend/internal/utils/extractdata"
-	"github.com/BibleBot/backend/internal/utils/logger"
-	"github.com/BibleBot/backend/internal/utils/namefetcher"
+	"internal.kerygma.digital/kerygma-digital/biblebot/backend/models"
+	"internal.kerygma.digital/kerygma-digital/biblebot/backend/routes/commands"
+	"internal.kerygma.digital/kerygma-digital/biblebot/backend/routes/verses"
+	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/extractdata"
+	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/logger"
+	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/namefetcher"
 
 	"github.com/gofiber/fiber/v2"
 	"gopkg.in/yaml.v2"
