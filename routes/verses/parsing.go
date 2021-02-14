@@ -14,8 +14,8 @@ import (
 
 // FindBooksInString locates a book name within a string, accounting for other parameters.
 func FindBooksInString(str string) (string, []models.BookSearchResult) {
-	books := namefetcher.GetBookNames(false)
-	defaultBooks := namefetcher.GetDefaultBookNames(false)
+	books := namefetcher.GetBookNames()
+	defaultBooks := namefetcher.GetDefaultBookNames()
 
 	var results []models.BookSearchResult
 
@@ -155,7 +155,7 @@ func GenerateReference(str string, bookSearchResult models.BookSearchResult, ver
 	isNT := false
 	isDEU := false
 
-	bookmapping := bookmap.GetBookmap(false)
+	bookmapping := bookmap.GetBookmap()
 	if correctBook, ok := bookmapping["ot"][book]; ok {
 		isOT = true
 		book = correctBook

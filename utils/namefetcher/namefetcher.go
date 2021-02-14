@@ -25,10 +25,10 @@ var defaultNames []string
 var nuisances []string
 
 // GetBookNames returns map[string][]string of saved book names.
-func GetBookNames(isTest bool) map[string][]string {
+func GetBookNames() map[string][]string {
 	// If we're testing, the working directory is tests/, so paths need to be adjusted for that.
 	dir := "./"
-	if isTest {
+	if _, err := os.Stat(dir + "data/names/completed_names.json"); os.IsNotExist(err) {
 		dir = "./../"
 	}
 
@@ -44,10 +44,10 @@ func GetBookNames(isTest bool) map[string][]string {
 }
 
 // GetDefaultBookNames returns []string of default book names.
-func GetDefaultBookNames(isTest bool) []string {
+func GetDefaultBookNames() []string {
 	// If we're testing, the working directory is tests/, so paths need to be adjusted for that.
 	dir := "./"
-	if isTest {
+	if _, err := os.Stat(dir + "data/names/completed_names.json"); os.IsNotExist(err) {
 		dir = "./../"
 	}
 
@@ -72,7 +72,6 @@ func FetchBookNames(apiBibleKey string, isDryRun bool, isTest bool) error {
 
 	// We do not want to run on dry runs or testing.
 	if isDryRun && !isTest {
-
 		sp.FinalMSG = hiCyan("[info] ") + hiMagenta("<namefetcher> ") + "✔️  Name fetching set to dry, skipping.\n"
 
 		sp.Start()

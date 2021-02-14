@@ -9,12 +9,12 @@ import (
 )
 
 // GetBookmap returns the JSON object defined in data/names/book_map.json
-func GetBookmap(isTest bool) map[string]map[string]string {
+func GetBookmap() map[string]map[string]string {
 	var bookmap map[string]map[string]string
 
 	// If we're testing, the working directory is tests/, so paths need to be adjusted for that.
 	dir := "./"
-	if isTest {
+	if _, err := os.Stat(dir + "data/names/completed_names.json"); os.IsNotExist(err) {
 		dir = "./../"
 	}
 
