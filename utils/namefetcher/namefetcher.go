@@ -182,7 +182,7 @@ func getBibleGatewayVersions(sp *spinner.Spinner) (map[string]string, error) {
 		return nil, logger.LogWithError("namefetcher", "couldn't read biblegateway version list", err)
 	}
 
-	document.Find(".translation-name").Each(func(index int, element *goquery.Selection) {
+	document.Find(".translation-name").Each(func(idx int, element *goquery.Selection) {
 		target := element.Find("a")
 
 		text := target.Text()
@@ -222,8 +222,8 @@ func getBibleGatewayNames(versions map[string]string, sp *spinner.Spinner) (map[
 			return nil, logger.LogWithError("namefetcher", msg, err)
 		}
 
-		document.Find(".book-name").Each(func(index int, element *goquery.Selection) {
-			element.Find("span").Each(func(index int, span *goquery.Selection) {
+		document.Find(".book-name").Each(func(idx int, element *goquery.Selection) {
+			element.Find("span").Each(func(idx int, span *goquery.Selection) {
 				span.Remove()
 			})
 

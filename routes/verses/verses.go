@@ -4,9 +4,12 @@ package verses
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
+
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/models"
+	"internal.kerygma.digital/kerygma-digital/biblebot/backend/routes/verses/interfaces"
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/converters"
 )
 
@@ -31,18 +34,27 @@ func fetchVerse(c *fiber.Ctx) error {
 		return err
 	}
 
-	str, bookSearchResults := FindBooksInString(query.Body)
+	str, bookSearchResults := FindBooksInString(strings.ToLower(query.Body))
+
+	var verseResults []*models.Verse
 
 	for _, bsr := range bookSearchResults {
-		reference := GenerateReference(str, bsr, models.Version{})
+		reference := GenerateReference(str, bsr, models.Version{
+			Abbreviation: "RSV",
+		})
 		if reference == nil {
 			continue
 		}
 
-		fmt.Println(reference.ToString())
+		verse, err := interfaces.GetBibleGatewayVerse(reference, true, true)
+		if err != nil {
+			return err
+		}
+
+		verseResults = append(verseResults, verse)
 	}
 
-	return c.SendString("")
+	return c.JSON(verseResults)
 }
 
 func processInput(input []byte) (*models.Query, error) {
