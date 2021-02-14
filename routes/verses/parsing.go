@@ -21,12 +21,8 @@ func FindBooksInString(str string) (string, []models.BookSearchResult) {
 
 	for bookKey, valueArray := range books {
 		for _, item := range valueArray {
-			potentialValues := []string{strings.ToUpper(item), strings.ToLower(item), strings.ToTitle(item), item}
-
-			for _, value := range potentialValues {
-				if isValueInString(value, str) {
-					str = strings.Replace(str, value, bookKey, -1)
-				}
+			if isValueInString(strings.ToLower(item), str) {
+				str = strings.Replace(str, strings.ToLower(item), bookKey, -1)
 			}
 		}
 	}
