@@ -1,6 +1,8 @@
 package slices
 
-import "internal.kerygma.digital/kerygma-digital/biblebot/backend/models"
+import (
+	"reflect"
+)
 
 // Index finds index of string in []string, otherwise returns -1
 func Index(vs []string, t string) int {
@@ -12,8 +14,8 @@ func Index(vs []string, t string) int {
 	return -1
 }
 
-// MapSlice maps a []string to a []int
-func MapSlice(vs []string, f func(string, int) int) []int {
+// MapSliceToInt maps a []string to a []int
+func MapSliceToInt(vs []string, f func(string, int) int) []int {
 	vsm := make([]int, len(vs))
 	for i, v := range vs {
 		vsm[i] = f(v, i)
@@ -51,38 +53,47 @@ func IntInSlice(a int, list []int) bool {
 	return false
 }
 
-// FilterBSR filters []BookSearchResults if function returns true for any value.
-func FilterBSR(vs []models.BookSearchResult, f func(models.BookSearchResult) bool) []models.BookSearchResult {
-	vsf := make([]models.BookSearchResult, 0)
-	for _, v := range vs {
-		if f(v) {
-			vsf = append(vsf, v)
+// FilterInterface filters interface{} if function returns true for any value.
+func FilterInterface(elements interface{}, cond func(interface{}) bool) interface{} {
+	contentType := reflect.TypeOf(elements)
+	contentValue := reflect.ValueOf(elements)
+
+	newElements := reflect.MakeSlice(contentType, 0, 0)
+	for i := 0; i < contentValue.Len(); i++ {
+		if v := contentValue.Index(i); cond(v.Interface()) {
+			newElements = reflect.Append(newElements, v)
 		}
 	}
-	return vsf
+
+	return newElements.Interface()
 }
 
-// IndexBSR returns index of BSR in a BSR slice, otherwise -1.
-func IndexBSR(vs []models.BookSearchResult, t models.BookSearchResult) int {
-	for i, v := range vs {
-		if v == t {
+// IndexInterface returns index of interface{} in an interface{}, otherwise -1.
+func IndexInterface(elements interface{}, t interface{}) int {
+	contentValue := reflect.ValueOf(elements)
+
+	for i := 0; i < contentValue.Len(); i++ {
+		if i == t {
 			return i
 		}
 	}
 	return -1
 }
 
-// RemoveBSRDuplicates removes duplicates from []BookSearchResult and returns the new array.
-func RemoveBSRDuplicates(elements []models.BookSearchResult) []models.BookSearchResult {
-	encountered := map[models.BookSearchResult]bool{}
-	result := []models.BookSearchResult{}
+// RemoveInterfaceDuplicates removes duplicates from []BookSearchResult and returns the new array.
+func RemoveInterfaceDuplicates(elements interface{}) interface{} {
+	contentType := reflect.TypeOf(elements)
+	contentValue := reflect.ValueOf(elements)
 
-	for v := range elements {
-		if encountered[elements[v]] == true {
+	encountered := reflect.MakeMap(reflect.MapOf(contentType, reflect.TypeOf("bool")))
+	result := reflect.MakeSlice(contentType, 0, 0)
+
+	for i := 0; i < contentValue.Len(); i++ {
+		if encountered.MapIndex(contentValue.Index(i)).Bool() {
 			// Do not add duplicate.
 		} else {
-			encountered[elements[v]] = true
-			result = append(result, elements[v])
+			encountered.SetMapIndex(contentValue.Index(i), reflect.ValueOf(true))
+			result = reflect.Append(result, contentValue.Index(i))
 		}
 	}
 
