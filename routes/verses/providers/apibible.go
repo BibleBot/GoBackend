@@ -1,4 +1,4 @@
-package interfaces
+package providers
 
 // This will handle API.Bible requests.
 
