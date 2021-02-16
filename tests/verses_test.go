@@ -25,6 +25,7 @@ func TestVerses(t *testing.T) {
 					EndingVerse:     0,
 					Version: models.Version{
 						Abbreviation: "RSV",
+						Source:       "bg",
 					},
 
 					IsOT:  true,

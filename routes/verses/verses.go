@@ -9,15 +9,20 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/models"
-	"internal.kerygma.digital/kerygma-digital/biblebot/backend/routes/verses/interfaces"
+	"internal.kerygma.digital/kerygma-digital/biblebot/backend/routes/verses/providers"
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/converters"
+	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/logger"
 )
 
-var _config *models.Config
+var (
+	config     *models.Config
+	bgProvider *providers.BibleGatewayProvider
+)
 
 // RegisterRouter registers routers related to verse processing.
-func RegisterRouter(app *fiber.App, config *models.Config) {
-	_config = config
+func RegisterRouter(app *fiber.App, cfg *models.Config) {
+	config = cfg
+	bgProvider = providers.NewBibleGatewayProvider()
 
 	app.Get("/api/verses/fetch", fetchVerse)
 }
@@ -41,12 +46,13 @@ func fetchVerse(c *fiber.Ctx) error {
 	for _, bsr := range bookSearchResults {
 		reference := GenerateReference(str, bsr, models.Version{
 			Abbreviation: "RSV",
+			Source:       "bg",
 		})
 		if reference == nil {
 			continue
 		}
 
-		verse, err := interfaces.GetBibleGatewayVerse(reference, true, true)
+		verse, err := ProcessVerse(reference, true, true)
 		if err != nil {
 			return err
 		}
@@ -55,6 +61,21 @@ func fetchVerse(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(verseResults)
+}
+
+// ProcessVerse takes a reference and formatting toggles, returning a Verse object with the result.
+func ProcessVerse(ref *models.Reference, titles bool, verseNumbers bool) (*models.Verse, error) {
+	var provider models.Provider
+
+	switch ref.Version.Source {
+	case "bg":
+		provider = bgProvider
+		break
+	default:
+		return nil, logger.LogWithError("processVerse", "invalid provider found in reference", nil)
+	}
+
+	return provider.GetVerse(ref, titles, verseNumbers)
 }
 
 func processInput(input []byte) (*models.Query, error) {

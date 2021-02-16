@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"sync"
 
 	"github.com/PuerkitoBio/goquery"
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/models"
@@ -11,8 +12,25 @@ import (
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/textpurification"
 )
 
-// GetBibleGatewayVerse fetches a Verse based upon a Reference, for BibleGateway versions.
-func GetBibleGatewayVerse(ref *models.Reference, titles bool, verseNumbers bool) (*models.Verse, error) {
+// BibleGatewayProvider is a Provider for BibleGateway-based versions.
+type BibleGatewayProvider struct{}
+
+var (
+	once     sync.Once
+	instance *BibleGatewayProvider
+)
+
+// NewBibleGatewayProvider creates a BibleGatewayProvider if one does not already exist, otherwise returns existing instance.
+func NewBibleGatewayProvider() *BibleGatewayProvider {
+	once.Do(func() {
+		instance = &BibleGatewayProvider{}
+	})
+
+	return instance
+}
+
+// GetVerse fetches a Verse based upon a Reference, for BibleGateway versions.
+func (bgp *BibleGatewayProvider) GetVerse(ref *models.Reference, titles bool, verseNumbers bool) (*models.Verse, error) {
 	URL := fmt.Sprintf("https://www.biblegateway.com/passage/?search=%s&version=%s&interface=print", ref.ToString(), ref.Version.Abbreviation)
 
 	resp, err := http.Get(URL)
@@ -74,4 +92,9 @@ func GetBibleGatewayVerse(ref *models.Reference, titles bool, verseNumbers bool)
 		Title:     title,
 		Text:      textpurification.PurifyVerseText(text),
 	}, nil
+}
+
+// Search gathers search results based on a query.
+func (bgp BibleGatewayProvider) Search(query string, version *models.Version) (*map[string]string, error) {
+	return nil, nil
 }
