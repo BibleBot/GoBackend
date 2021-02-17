@@ -1,4 +1,4 @@
-FROM golang:1.15
+FROM golang:1.16
 ARG DOMAIN
 ENV DOMAIN=${DOMAIN:-localhost}
 

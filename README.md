@@ -6,7 +6,7 @@ The Backend API for BibleBot.
 
 ## Prerequisites
 
-- Go v1.15
+- Go v1.16
 - Docker
 
 ## Self-Host Setup

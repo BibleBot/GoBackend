@@ -12,6 +12,7 @@ package fiber
 import (
 	"bufio"
 	"crypto/tls"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net"
@@ -28,12 +29,11 @@ import (
 	"github.com/gofiber/fiber/v2/internal/colorable"
 	"github.com/gofiber/fiber/v2/internal/isatty"
 	"github.com/gofiber/fiber/v2/utils"
-
 	"github.com/valyala/fasthttp"
 )
 
 // Version of current fiber package
-const Version = "2.3.3"
+const Version = "2.5.0"
 
 // Handler defines a function to serve HTTP requests.
 type Handler = func(*Ctx) error
@@ -92,6 +92,8 @@ type App struct {
 	stack [][]*Route
 	// Route stack divided by HTTP methods and route prefixes
 	treeStack []map[string][]*Route
+	// contains the information if the route stack has been changed to build the optimized tree
+	routesRefreshed bool
 	// Amount of registered routes
 	routesCount int
 	// Amount of registered handlers
@@ -270,6 +272,19 @@ type Config struct {
 	//
 	// Default: false
 	// RedirectFixedPath bool
+
+	// When set by an external client of Fiber it will use the provided implementation of a
+	// JSONMarshal
+	//
+	// Allowing for flexibility in using another json library for encoding
+	// Default: json.Marshal
+	JSONEncoder utils.JSONMarshal `json:"-"`
+
+	// Known networks are "tcp", "tcp4" (IPv4-only), "tcp6" (IPv6-only)
+	// WARNING: When prefork is set to true, only "tcp4" and "tcp6" can be chose.
+	//
+	// Default: NetworkTCP4
+	Network string
 }
 
 // Static defines configuration options when defining static assets.
@@ -302,6 +317,11 @@ type Static struct {
 	//
 	// Optional. Default value 0.
 	MaxAge int `json:"max_age"`
+
+	// Next defines a function to skip this middleware when returned true.
+	//
+	// Optional. Default: nil
+	Next func(c *Ctx) bool
 }
 
 // Default Config values
@@ -377,6 +397,12 @@ func New(config ...Config) *App {
 	}
 	if app.config.ErrorHandler == nil {
 		app.config.ErrorHandler = DefaultErrorHandler
+	}
+	if app.config.JSONEncoder == nil {
+		app.config.JSONEncoder = json.Marshal
+	}
+	if app.config.Network == "" {
+		app.config.Network = NetworkTCP4
 	}
 
 	// Init app
@@ -535,10 +561,11 @@ func NewError(code int, message ...string) *Error {
 func (app *App) Listener(ln net.Listener) error {
 	// Prefork is supported for custom listeners
 	if app.config.Prefork {
-		addr, tls := lnMetadata(ln)
-		return app.prefork(addr, tls)
+		addr, tlsConfig := lnMetadata(app.config.Network, ln)
+		return app.prefork(app.config.Network, addr, tlsConfig)
 	}
-
+	// prepare the server for the start
+	app.startupProcess()
 	// Print startup message
 	if !app.config.DisableStartupMessage {
 		app.startupMessage(ln.Addr().String(), false, "")
@@ -554,13 +581,15 @@ func (app *App) Listener(ln net.Listener) error {
 func (app *App) Listen(addr string) error {
 	// Start prefork
 	if app.config.Prefork {
-		return app.prefork(addr, nil)
+		return app.prefork(app.config.Network, addr, nil)
 	}
 	// Setup listener
-	ln, err := net.Listen("tcp4", addr)
+	ln, err := net.Listen(app.config.Network, addr)
 	if err != nil {
 		return err
 	}
+	// prepare the server for the start
+	app.startupProcess()
 	// Print startup message
 	if !app.config.DisableStartupMessage {
 		app.startupMessage(ln.Addr().String(), false, "")
@@ -592,13 +621,15 @@ func (app *App) ListenTLS(addr, certFile, keyFile string) error {
 				cert,
 			},
 		}
-		return app.prefork(addr, config)
+		return app.prefork(app.config.Network, addr, config)
 	}
 	// Setup listener
-	ln, err := net.Listen("tcp4", addr)
+	ln, err := net.Listen(app.config.Network, addr)
 	if err != nil {
 		return err
 	}
+	// prepare the server for the start
+	app.startupProcess()
 	// Print startup message
 	if !app.config.DisableStartupMessage {
 		app.startupMessage(ln.Addr().String(), true, "")
@@ -614,6 +645,8 @@ func (app *App) Config() Config {
 
 // Handler returns the server handler.
 func (app *App) Handler() fasthttp.RequestHandler {
+	// prepare the server for the start
+	app.startupProcess()
 	return app.handler
 }
 
@@ -669,6 +702,8 @@ func (app *App) Test(req *http.Request, msTimeout ...int) (resp *http.Response, 
 	if _, err = conn.r.Write(dump); err != nil {
 		return nil, err
 	}
+	// prepare the server for the start
+	app.startupProcess()
 
 	// Serve conn to server
 	channel := make(chan error)
@@ -767,6 +802,15 @@ func (app *App) init() *App {
 	return app
 }
 
+// startupProcess Is the method which executes all the necessary processes just before the start of the server.
+func (app *App) startupProcess() *App {
+	app.mutex.Lock()
+	app.buildTree()
+	app.mutex.Unlock()
+	return app
+}
+
+// startupMessage prepares the startup message with the handler number, port, address and other information
 func (app *App) startupMessage(addr string, tls bool, pids string) {
 	// ignore child processes
 	if IsChild() {
