@@ -47,7 +47,7 @@ func GetBookNames() map[string][]string {
 func GetDefaultBookNames() []string {
 	// If we're testing, the working directory is tests/, so paths need to be adjusted for that.
 	dir := "./"
-	if _, err := os.Stat(dir + "data/names/completed_names.json"); os.IsNotExist(err) {
+	if _, err := os.Stat(dir + "data/names/default_names.json"); os.IsNotExist(err) {
 		dir = "./../"
 	}
 
