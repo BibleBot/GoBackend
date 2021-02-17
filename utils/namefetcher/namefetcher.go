@@ -1,6 +1,8 @@
 package namefetcher
 
 import (
+	_ "embed" // for go:embed
+
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -18,46 +20,47 @@ import (
 	"github.com/fatih/color"
 )
 
-var apiBibleNames = make(map[string]string)
-var abbreviations = make(map[string][]string)
-var bookNames = make(map[string][]string)
-var defaultNames []string
-var nuisances []string
+var (
+	//go:embed data/apibible_names.json
+	apiBibleFile []byte
+
+	//go:embed data/abbreviations.json
+	abbreviationsFile []byte
+
+	//go:embed data/default_names.json
+	defaultNamesFile []byte
+
+	//go:embed data/nuisances.json
+	nuisancesFile []byte
+
+	apiBibleNames = make(map[string]string)
+	abbreviations = make(map[string][]string)
+	bookNames     = make(map[string][]string)
+	defaultNames  []string
+	nuisances     []string
+)
 
 // GetBookNames returns map[string][]string of saved book names.
 func GetBookNames() map[string][]string {
-	// If we're testing, the working directory is tests/, so paths need to be adjusted for that.
-	dir := "./"
-	if _, err := os.Stat(dir + "data/names/completed_names.json"); os.IsNotExist(err) {
-		dir = "./../"
-	}
+	if len(bookNames) == 0 {
+		// Get mapping of API.Bible books to BibleGateway, which we use as a standard.
+		file, err := ioutil.ReadFile("./utils/namefetcher/data/completed_names.json")
+		if err != nil {
+			logger.LogWithError("namefetcher", "failed to open completed_names.json, run backend normally before testing again", err)
+			os.Exit(3)
+		}
 
-	// Get mapping of API.Bible books to BibleGateway, which we use as a standard.
-	file, err := ioutil.ReadFile(dir + "data/names/completed_names.json")
-	if err != nil {
-		logger.LogWithError("namefetcher", "failed to open completed_names.json, run backend normally before testing again", err)
-		os.Exit(3)
+		json.Unmarshal(file, &bookNames)
 	}
-	json.Unmarshal(file, &bookNames)
 
 	return bookNames
 }
 
 // GetDefaultBookNames returns []string of default book names.
 func GetDefaultBookNames() []string {
-	// If we're testing, the working directory is tests/, so paths need to be adjusted for that.
-	dir := "./"
-	if _, err := os.Stat(dir + "data/names/default_names.json"); os.IsNotExist(err) {
-		dir = "./../"
+	if len(defaultNames) == 0 {
+		json.Unmarshal(defaultNamesFile, &defaultNames)
 	}
-
-	// Get mapping of API.Bible books to BibleGateway, which we use as a standard.
-	file, err := ioutil.ReadFile(dir + "data/names/default_names.json")
-	if err != nil {
-		logger.LogWithError("namefetcher", "failed to open default_names.json, run backend normally before testing again", err)
-		os.Exit(3)
-	}
-	json.Unmarshal(file, &defaultNames)
 
 	return defaultNames
 }
@@ -85,25 +88,13 @@ func FetchBookNames(apiBibleKey string, isDryRun bool, isTest bool) error {
 	}
 
 	// Get mapping of API.Bible books to BibleGateway, which we use as a standard.
-	file, err := ioutil.ReadFile("./data/names/apibible_names.json")
-	if err != nil {
-		return logger.LogWithError("namefetcher", "failed to open apibible_names.json", err)
-	}
-	json.Unmarshal(file, &apiBibleNames)
+	json.Unmarshal(apiBibleFile, &apiBibleNames)
 
 	// Get standard English abbreviations.
-	file, err = ioutil.ReadFile("./data/names/abbreviations.json")
-	if err != nil {
-		return logger.LogWithError("namefetcher", "failed to open abbreviations.json", err)
-	}
-	json.Unmarshal(file, &abbreviations)
+	json.Unmarshal(abbreviationsFile, &abbreviations)
 
 	// Get standard book IDs.
-	file, err = ioutil.ReadFile("./data/names/default_names.json")
-	if err != nil {
-		return logger.LogWithError("namefetcher", "failed to open default_names.json", err)
-	}
-	json.Unmarshal(file, &defaultNames)
+	json.Unmarshal(defaultNamesFile, &defaultNames)
 
 	// Pre-flight checks have cleared. Houston, we have liftoff.
 	bgVersions, err := getBibleGatewayVersions(sp)
@@ -128,9 +119,9 @@ func FetchBookNames(apiBibleKey string, isDryRun bool, isTest bool) error {
 
 	sp.Suffix = "  Writing to file..."
 
-	_, err = os.Stat("./data/names/completed_names.json")
+	_, err = os.Stat("./utils/namefetcher/data/completed_names.json")
 	if !os.IsNotExist(err) {
-		err = os.Remove("./data/names/completed_names.json")
+		err = os.Remove("./utils/namefetcher/data/completed_names.json")
 
 		if err != nil {
 			sp.Stop()
@@ -140,7 +131,7 @@ func FetchBookNames(apiBibleKey string, isDryRun bool, isTest bool) error {
 
 	completedNames := mergeThreeMaps(bgNames, abNames, abbreviations)
 
-	resultFile, err := os.OpenFile("./data/names/completed_names.json", os.O_CREATE, os.ModePerm)
+	resultFile, err := os.OpenFile("./utils/namefetcher/data/completed_names.json", os.O_CREATE, os.ModePerm)
 	if err != nil {
 		sp.Stop()
 		return logger.LogWithError("namefetcher", "failed to open completed_names.json", err)
@@ -226,8 +217,7 @@ func getBibleGatewayNames(versions map[string]string, sp *spinner.Spinner) (map[
 				span.Remove()
 			})
 
-			dataName, _ := element.Attr("data-target")
-			_, exists := element.Attr("book-name")
+			dataName, exists := element.Attr("data-target")
 			if exists {
 				dataName = string([]rune(dataName)[1 : len(dataName)-5])
 				bookName := strings.TrimSpace(element.Text())
@@ -395,7 +385,7 @@ func getAPIBibleNames(versions map[string]string, apiKey string, sp *spinner.Spi
 }
 
 func isNuisance(word string) error {
-	file, err := ioutil.ReadFile("./data/names/nuisances.json")
+	file, err := ioutil.ReadFile("./utils/namefetcher/data/nuisances.json")
 	if err != nil {
 		return logger.LogWithError("namefetcher", "failed to open nuisances.json", err)
 	}
