@@ -32,19 +32,7 @@ var fiberConfig = fiber.Config{DisableStartupMessage: true}
 func main() {
 	logger.LogInfo("init", fmt.Sprintf("BibleBot Backend %s by Kerygma Digital", version))
 
-	// Create configuration from config.yml.
-	config := readConfig()
-
-	// Fetch book names.
-	namefetcher.FetchBookNames(config.APIBible, config.IsDryRun, false)
-
-	// Extract all applicable data files.
-	err := extractData(config)
-	if err != nil {
-		os.Exit(1)
-	}
-
-	app := createApp(config)
+	app, config := SetupApp(false)
 
 	// Set up HTTPS based on domain argument.
 	var domain string
@@ -83,7 +71,22 @@ func main() {
 	}
 }
 
-func createApp(config *models.Config) *fiber.App {
+// SetupApp basically creates the normal app but without the listener and logging frills.
+func SetupApp(isTest bool) (*fiber.App, *models.Config) {
+	// Create configuration from config.yml.
+	config := readConfig(isTest)
+
+	// Fetch book names.
+	if !isTest {
+		namefetcher.FetchBookNames(config.APIBible, config.IsDryRun, false)
+	}
+
+	// Extract all applicable data files.
+	err := extractData(config)
+	if err != nil {
+		os.Exit(1)
+	}
+
 	// By default, we'll just serve a basic HTML page indicating what's running.
 	app := fiber.New(fiberConfig)
 	app.Static("/", "static")
@@ -92,15 +95,20 @@ func createApp(config *models.Config) *fiber.App {
 	commands.RegisterRouter(app)
 	verses.RegisterRouter(app, config)
 
-	return app
+	return app, config
 }
 
-func readConfig() *models.Config {
+func readConfig(isTest bool) *models.Config {
 	var config models.Config
+	path := "./config.yml"
 
-	file, err := ioutil.ReadFile("./config.yml")
+	if isTest {
+		path = "./config.test.yml"
+	}
+
+	file, err := ioutil.ReadFile(path)
 	if os.IsNotExist(err) {
-		logger.LogWithError("config", "config.yml does not exist", err)
+		logger.LogWithError("config", fmt.Sprintf("%s does not exist", path), err)
 		os.Exit(1)
 	} else if err != nil {
 		logger.LogWithError("config", err.Error(), err)

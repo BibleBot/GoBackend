@@ -1,8 +1,9 @@
-package tests
+package main
 
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -12,6 +13,24 @@ import (
 	"github.com/stretchr/testify/assert"
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/models"
 )
+
+func TestCommands(t *testing.T) {
+	assert.Equal(t, true, true)
+	/*app := SetupApp()
+
+	req := httptest.NewRequest("GET", "/api/commands/test", nil)
+	resp, _ := app.Test(req)
+	defer resp.Body.Close()
+
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	assert.Equal(t, "test", string(body), "Output should be equal to input.")*/
+}
 
 func TestVerses(t *testing.T) {
 	inputToOutput := map[string][]models.Verse{
@@ -38,7 +57,7 @@ func TestVerses(t *testing.T) {
 		},
 	}
 
-	app := SetupApp()
+	app, _ := SetupApp(true)
 
 	for input, output := range inputToOutput {
 		input := map[string]string{
@@ -66,6 +85,6 @@ func TestVerses(t *testing.T) {
 			log.Fatal(err)
 		}
 
-		assert.Equal(t, outputJSON, body, "Requesting Psalm 3:1- should give Psalm 3:1 and the rest of the chapter.")
+		assert.Equal(t, outputJSON, body, fmt.Sprintf("'%s' should provide expected output", input["body"]))
 	}
 }
