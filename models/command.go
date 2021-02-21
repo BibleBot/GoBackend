@@ -47,7 +47,22 @@ var Translations = Command{
 	Params:         nil, // Valid version or language using go:embed? or initialize or smth
 	IsOwnerCommand: false,
 	Process: func() error {
-		return nil
+		return nil // To implement
+	},
+}
+
+// Commands for fetching verses
+var Verses = Command{
+	Command: []string{
+		"search",
+		"random",
+		"truerandom",
+		"dailyverse",
+	},
+	Params:         nil, // Valid reference if applicable
+	IsOwnerCommand: false,
+	Process: func() error {
+		return nil // To implement
 	},
 }
 
@@ -63,21 +78,21 @@ var Creeds = Command{
 	Params:         nil,
 	IsOwnerCommand: false,
 	Process: func() error {
-		return nil
+		return nil // To implement
 	},
 }
 
-// Commands for fetching verses
-var Verses = Command{
+// Commands for fetching miscellaneous info
+var MiscFetch = Command{
 	Command: []string{
-		"search",
-		"random",
-		"truerandom",
-		"dailyverse",
+		"invite",
+		"stats",
+		"misc",
+		"ping",
 	},
-	Params:         nil, // Valid reference if applicable
+	Params:         nil,
 	IsOwnerCommand: false,
 	Process: func() error {
-		return nil
+		return nil // To implement
 	},
 }
