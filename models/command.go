@@ -11,7 +11,9 @@ type Command struct {
 
 // Basic help command (biblebot)
 var Help = Command{
-	Command:        []string{"biblebot"},
+	Command: []string{
+		"biblebot",
+	},
 	Params:         nil,
 	IsOwnerCommand: false,
 	Process: func() error {
@@ -33,5 +35,18 @@ var Formatting = Command{
 	IsOwnerCommand: false,
 	Process: func() error {
 		return nil // To implement
+	},
+}
+
+// Commands for changing versions/language
+var Translations = Command{
+	Command: []string{
+		"version",
+		"language",
+	},
+	Params:         nil, // Valid version or language using go:embed? or initialize or smth
+	IsOwnerCommand: false,
+	Process: func() error {
+		return nil
 	},
 }
