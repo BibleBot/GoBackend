@@ -96,3 +96,17 @@ var MiscFetch = Command{
 		return nil // To implement
 	},
 }
+
+// Commands only executable by owner(s)
+var Owner = Command{
+	Command: []string{
+		"echo",
+		"eval",
+		"leave",
+	},
+	Params:         nil, // Statements
+	IsOwnerCommand: true,
+	Process: func() error {
+		return nil // To implement
+	},
+}
