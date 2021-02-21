@@ -15,6 +15,23 @@ var Help = Command{
 	Params:         nil,
 	IsOwnerCommand: false,
 	Process: func() error {
-		return nil
+		return nil // To implement
+	},
+}
+
+// Commands for changing formatting
+var Formatting = Command{
+	Command: []string{
+		"formatting",
+	},
+	Params: []string{
+		"default",
+		"embed",
+		"blockquote",
+		"code",
+	},
+	IsOwnerCommand: false,
+	Process: func() error {
+		return nil // To implement
 	},
 }
