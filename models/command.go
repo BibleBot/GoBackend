@@ -66,3 +66,18 @@ var Creeds = Command{
 		return nil
 	},
 }
+
+// Commands for fetching verses
+var Verses = Command{
+	Command: []string{
+		"search",
+		"random",
+		"truerandom",
+		"dailyverse",
+	},
+	Params:         nil, // Valid reference if applicable
+	IsOwnerCommand: false,
+	Process: func() error {
+		return nil
+	},
+}
