@@ -38,13 +38,29 @@ var Formatting = Command{
 	},
 }
 
-// Commands for changing versions/language
+// Commands for changing/fetching versions/language
 var Translations = Command{
 	Command: []string{
 		"version",
 		"language",
 	},
 	Params:         nil, // Valid version or language using go:embed? or initialize or smth
+	IsOwnerCommand: false,
+	Process: func() error {
+		return nil
+	},
+}
+
+// Commands for fetching creeds
+var Creeds = Command{
+	Command: []string{
+		"creeds",
+		"apostles",
+		"nicene325",
+		"nicene",
+		"chalcedon",
+	},
+	Params:         nil,
 	IsOwnerCommand: false,
 	Process: func() error {
 		return nil
