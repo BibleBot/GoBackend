@@ -1,4 +1,5 @@
-commit-message: "[ci skip]"
+commit_message: "(Crowdin) Updates to %language%. [ci skip]"
+append_commit_message: false
 
 files:
   - source: /i18n/default/default.json
