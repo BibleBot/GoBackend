@@ -7,7 +7,7 @@ stages:
     - test
 
 build:dev:
-    image: docker:20
+    image: docker:dind
     stage: build
     before_script:
         - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
@@ -22,7 +22,7 @@ build:dev:
         - docker push $CI_REGISTRY_IMAGE:dev-latest
 
 build:prod:
-    image: docker:20
+    image: docker:dind
     stage: build
     before_script:
         - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
@@ -39,7 +39,7 @@ build:prod:
 
 push:dev:tag:
     needs: ["build:dev"]
-    image: docker:20
+    image: docker:dind
     stage: push
     variables:
         GIT_STRATEGY: none
@@ -54,7 +54,7 @@ push:dev:tag:
 
 push:prod:tag:
     needs: ["build:prod"]
-    image: docker:20
+    image: docker:dind
     stage: push
     variables:
         GIT_STRATEGY: none
