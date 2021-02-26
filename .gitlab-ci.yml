@@ -14,6 +14,7 @@ build:dev:
     script:
         - >
           docker build
+          --cache-from $CI_REGISTRY_IMAGE:dev-latest
           --pull
           --file Dockerfile
           --tag $CI_REGISTRY_IMAGE:dev-latest
@@ -28,6 +29,7 @@ build:prod:
     script:
         - >
           docker build
+          --cache-from $CI_REGISTRY_IMAGE:prod-latest
           --pull
           --file Dockerfile
           --build-arg DOMAIN=api.biblebot.xyz
