@@ -5,7 +5,7 @@ import "internal.kerygma.digital/kerygma-digital/biblebot/backend/models"
 // Command struct for changing languages.
 var languageCommand = models.Command{
 	Command: "language",
-	Process: func() error {
+	Process: func(params []string) error {
 		return nil // To implement
 	},
 }

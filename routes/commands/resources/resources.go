@@ -5,7 +5,7 @@ import "internal.kerygma.digital/kerygma-digital/biblebot/backend/models"
 // Command struct for the creeds command.
 var creedsCommand = models.Command{
 	Command: "creeds",
-	Process: func() error {
+	Process: func(params []string) error {
 		return nil // To implement
 	},
 }
@@ -13,7 +13,7 @@ var creedsCommand = models.Command{
 // Command struct for the apostles command.
 var apostlesCommand = models.Command{
 	Command: "apostles",
-	Process: func() error {
+	Process: func(params []string) error {
 		return nil // To implement
 	},
 }
@@ -21,7 +21,7 @@ var apostlesCommand = models.Command{
 // Command struct for the nicene325 command.
 var nicene325Command = models.Command{
 	Command: "nicene325",
-	Process: func() error {
+	Process: func(params []string) error {
 		return nil // To implement
 	},
 }
@@ -29,7 +29,7 @@ var nicene325Command = models.Command{
 // Command struct for the nicene command.
 var niceneCommand = models.Command{
 	Command: "nicene",
-	Process: func() error {
+	Process: func(params []string) error {
 		return nil // To implement
 	},
 }
@@ -37,7 +37,7 @@ var niceneCommand = models.Command{
 // Command struct for the chalcedon command.
 var chalcedonCommand = models.Command{
 	Command: "chalcedon",
-	Process: func() error {
+	Process: func(params []string) error {
 		return nil // To implement
 	},
 }

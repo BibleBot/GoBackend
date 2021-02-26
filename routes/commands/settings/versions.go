@@ -5,7 +5,7 @@ import "internal.kerygma.digital/kerygma-digital/biblebot/backend/models"
 // Command struct for changing versions.
 var versionCommand = models.Command{
 	Command: "version",
-	Process: func() error {
+	Process: func(params []string) error {
 		return nil // To implement
 	},
 }

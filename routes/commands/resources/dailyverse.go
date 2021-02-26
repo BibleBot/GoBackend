@@ -5,7 +5,7 @@ import "internal.kerygma.digital/kerygma-digital/biblebot/backend/models"
 // Command struct for the dailyverse command.
 var dailyverseCommand = models.Command{
 	Command: "dailyverse",
-	Process: func() error {
+	Process: func(params []string) error {
 		return nil // To implement
 	},
 }
