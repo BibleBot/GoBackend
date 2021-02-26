@@ -3,6 +3,8 @@ package commands
 // Just a place to point to the right command.
 // Possibly create a Command struct to expect similar results? Might be easier said than done.
 
+// Homeless Commands: {"invite", "stats", "misc", "ping", "echo", "eval", "leave"}
+
 import (
 	_ "embed" // for go:embeds
 	"encoding/json"

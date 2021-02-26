@@ -4,11 +4,7 @@ import "internal.kerygma.digital/kerygma-digital/biblebot/backend/models"
 
 // Command struct for help commands.
 var helpCommand = models.Command{
-	Command: []string{
-		"biblebot",
-	},
-	Params:         nil,
-	IsOwnerCommand: false,
+	Command: "biblebot",
 	Process: func() error {
 		return nil // To implement
 	},

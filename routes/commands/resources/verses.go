@@ -2,15 +2,25 @@ package resources
 
 import "internal.kerygma.digital/kerygma-digital/biblebot/backend/models"
 
-// Command struct for verse lookup commands.
-var verseFetchCommand = models.Command{
-	Command: []string{
-		"search",
-		"random",
-		"truerandom",
+// Command struct for the search command.
+var searchCommand = models.Command{
+	Command: "search",
+	Process: func() error {
+		return nil // To implement
 	},
-	Params:         nil, // Valid reference if applicable
-	IsOwnerCommand: false,
+}
+
+// Command struct for the random command.
+var randomCommand = models.Command{
+	Command: "random",
+	Process: func() error {
+		return nil // To implement
+	},
+}
+
+// Command struct for the truerandom command.
+var truerandomCommand = models.Command{
+	Command: "truerandom",
 	Process: func() error {
 		return nil // To implement
 	},

@@ -3,12 +3,8 @@ package resources
 import "internal.kerygma.digital/kerygma-digital/biblebot/backend/models"
 
 // Command struct for the dailyverse command.
-var dailyVerseCommand = models.Command{
-	Command: []string{
-		"dailyverse",
-	},
-	Params:         nil,
-	IsOwnerCommand: false,
+var dailyverseCommand = models.Command{
+	Command: "dailyverse",
 	Process: func() error {
 		return nil // To implement
 	},

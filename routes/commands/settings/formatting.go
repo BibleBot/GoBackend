@@ -4,16 +4,7 @@ import "internal.kerygma.digital/kerygma-digital/biblebot/backend/models"
 
 // Command stuct for the formatting command.
 var formattingCommand = models.Command{
-	Command: []string{
-		"formatting",
-	},
-	Params: []string{
-		"default",
-		"embed",
-		"blockquote",
-		"code",
-	},
-	IsOwnerCommand: false,
+	Command: "formatting",
 	Process: func() error {
 		return nil // To implement
 	},
