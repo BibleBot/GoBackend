@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"internal.kerygma.digital/kerygma-digital/biblebot/backend/models"
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/logger"
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/slices"
 
@@ -282,7 +283,7 @@ func getAPIBibleVersions(apiKey string, sp *spinner.Spinner) (map[string]string,
 		return nil, logger.LogWithError("namefetcher", "couldn't read API.Bible version list", err)
 	}
 
-	var abResp = new(ABBibleResponse)
+	var abResp = new(models.ABBibleResponse)
 	err = json.Unmarshal(body, &abResp)
 	if err != nil {
 		sp.Stop()
@@ -332,7 +333,7 @@ func getAPIBibleNames(versions map[string]string, apiKey string, sp *spinner.Spi
 			return nil, logger.LogWithError("namefetcher", msg, err)
 		}
 
-		var abResp = new(ABBookResponse)
+		var abResp = new(models.ABBookResponse)
 		err = json.Unmarshal(body, &abResp)
 		if err != nil {
 			sp.Stop()

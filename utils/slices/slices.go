@@ -53,6 +53,16 @@ func IntInSlice(a int, list []int) bool {
 	return false
 }
 
+// IndexRune finds index of rune in []rune, otherwise returns -1
+func IndexRune(vs []rune, t rune) int {
+	for i, v := range vs {
+		if v == t {
+			return i
+		}
+	}
+	return -1
+}
+
 // FilterInterface filters interface{} if function returns true for any value.
 func FilterInterface(elements interface{}, cond func(interface{}) bool) interface{} {
 	contentType := reflect.TypeOf(elements)

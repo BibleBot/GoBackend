@@ -3,7 +3,7 @@ package models
 // Config is based off config.yml.
 type Config struct {
 	OwnerID          string   `yaml:"ownerID"`
-	APIBible         string   `yaml:"apiBible"`
+	APIBibleKey      string   `yaml:"apiBibleKey"`
 	IsDryRun         bool     `yaml:"dry"`
 	AccessKey        string   `yaml:"accessKey"`
 	LetsEncryptEmail string   `yaml:"letsEncryptEmail"`

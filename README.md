@@ -9,6 +9,10 @@ The Backend API for BibleBot.
 - Go v1.16
 - Docker
 
+## Notes
+
+- Tests that end with `_U` in the function name are unimplemented, to be made later.
+
 ## Self-Host Setup
 ```bash
 git clone https://internal.kerygma.digital/kerygma-digital/biblebot/backend && cd backend

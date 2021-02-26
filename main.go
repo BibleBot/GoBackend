@@ -78,7 +78,7 @@ func SetupApp(isTest bool) (*fiber.App, *models.Config) {
 
 	// Fetch book names.
 	if !isTest {
-		namefetcher.FetchBookNames(config.APIBible, config.IsDryRun, false)
+		namefetcher.FetchBookNames(config.APIBibleKey, config.IsDryRun, false)
 	}
 
 	// Extract all applicable data files.

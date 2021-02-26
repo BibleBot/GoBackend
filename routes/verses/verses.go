@@ -16,12 +16,14 @@ import (
 
 var (
 	config     *models.Config
+	abProvider *providers.APIBibleProvider
 	bgProvider *providers.BibleGatewayProvider
 )
 
 // RegisterRouter registers routers related to verse processing.
 func RegisterRouter(app *fiber.App, cfg *models.Config) {
 	config = cfg
+	abProvider = providers.NewAPIBibleProvider(cfg.APIBibleKey)
 	bgProvider = providers.NewBibleGatewayProvider()
 
 	app.Get("/api/verses/fetch", fetchVerse)
@@ -44,10 +46,28 @@ func fetchVerse(c *fiber.Ctx) error {
 	var verseResults []*models.Verse
 
 	for _, bsr := range bookSearchResults {
-		reference := GenerateReference(str, bsr, models.Version{
+		rsv := models.Version{
 			Abbreviation: "RSV",
 			Source:       "bg",
-		})
+		}
+
+		kjva := models.Version{
+			Abbreviation: "KJVA",
+			Source:       "ab",
+		}
+
+		var ver models.Version
+
+		switch query.TempVersion {
+		case "RSV":
+			ver = rsv
+			break
+		case "KJVA":
+			ver = kjva
+			break
+		}
+
+		reference := GenerateReference(str, bsr, ver)
 		if reference == nil {
 			continue
 		}
@@ -70,6 +90,9 @@ func ProcessVerse(ref *models.Reference, titles bool, verseNumbers bool) (*model
 	switch ref.Version.Source {
 	case "bg":
 		provider = bgProvider
+		break
+	case "ab":
+		provider = abProvider
 		break
 	default:
 		return nil, logger.LogWithError("processVerse", "invalid provider found in reference", nil)

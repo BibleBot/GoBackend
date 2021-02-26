@@ -9,6 +9,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/models"
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/logger"
+	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/slices"
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/textpurification"
 )
 
@@ -16,17 +17,17 @@ import (
 type BibleGatewayProvider struct{}
 
 var (
-	once     sync.Once
-	instance *BibleGatewayProvider
+	bgOnce     sync.Once
+	bgInstance *BibleGatewayProvider
 )
 
 // NewBibleGatewayProvider creates a BibleGatewayProvider if one does not already exist, otherwise returns existing instance.
 func NewBibleGatewayProvider() *BibleGatewayProvider {
-	once.Do(func() {
-		instance = &BibleGatewayProvider{}
+	bgOnce.Do(func() {
+		bgInstance = &BibleGatewayProvider{}
 	})
 
-	return instance
+	return bgInstance
 }
 
 // GetVerse fetches a Verse based upon a Reference, for BibleGateway versions.
@@ -62,6 +63,25 @@ func (bgp *BibleGatewayProvider) GetVerse(ref *models.Reference, titles bool, ve
 		} else {
 			element.Remove()
 		}
+	})
+
+	container.Find(".small-caps").Each(func(idx int, element *goquery.Selection) {
+		var newText []rune
+		for _, char := range element.Text() {
+			newChar := char
+			idx := slices.IndexRune(alphabet, char)
+
+			if idx != -1 {
+				for sIdx, sChar := range smallcaps {
+					if sIdx == idx {
+						newChar = sChar
+					}
+				}
+			}
+
+			newText = append(newText, newChar)
+		}
+		element.SetText(string(newText))
 	})
 
 	container.Find("br").Each(func(idx int, element *goquery.Selection) {
