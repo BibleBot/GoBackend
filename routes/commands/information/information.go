@@ -35,14 +35,16 @@ func NewHelpCommandRouter() *HelpCommandRouter {
 	return helpInstance
 }
 
-func (hcr *HelpCommandRouter) routerProcess(params []string) error {
+// RouterProcess checks which command process to run given the inputed command & parameters
+func (hcr *HelpCommandRouter) RouterProcess(params []string) error {
 	cm, ok := slices.FilterInterface(hcr.Commands, func(cm interface{}) bool {
 		cmd, ok := cm.(models.Command)
 		return (params[0] == cmd.Command) && ok
 	}).(models.Command)
 
 	if ok {
-		return cm.Process(params)
+		// Strip first element of slice (is the command itself)
+		return cm.Process(params[1:])
 	}
 	return nil // Implement return error
 }
