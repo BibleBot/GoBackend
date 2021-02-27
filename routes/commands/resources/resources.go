@@ -66,8 +66,8 @@ func NewResourcesCommandRouter() *resourcesCommandRouter {
 }
 
 // Process checks which command process to run given the inputed command & parameters
-func (rcr *resourcesCommandRouter) Process(params []string) error {
-	cm, ok := slices.FilterInterface(rcr.Commands, func(cm interface{}) bool {
+func (cr *resourcesCommandRouter) Process(params []string) error {
+	cm, ok := slices.FilterInterface(cr.Commands, func(cm interface{}) bool {
 		cmd, ok := cm.(models.Command)
 		return (params[0] == cmd.Command) && ok
 	}).(models.Command)
