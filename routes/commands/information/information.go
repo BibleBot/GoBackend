@@ -7,14 +7,14 @@ import (
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/slices"
 )
 
-type HelpCommandRouter struct {
+type helpCommandRouter struct {
 	Commands []models.Command
-	Process  func([]string) error
 }
 
 var (
+	// HelpInstance is the singleton router used to process its respective commands
+	HelpInstance *helpCommandRouter
 	helpOnce     sync.Once
-	helpInstance *HelpCommandRouter
 
 	helpCommand = models.Command{
 		Command: "biblebot",
@@ -24,19 +24,19 @@ var (
 	}
 )
 
-// NewHelpCommandRouter creates a HelpCommandRouter if one does not exist
-func NewHelpCommandRouter() *HelpCommandRouter {
+// NewHelpCommandRouter creates a helpCommandRouter if one does not already exist
+func NewHelpCommandRouter() *helpCommandRouter {
 	helpOnce.Do(func() {
-		helpInstance = &HelpCommandRouter{
+		HelpInstance = &helpCommandRouter{
 			Commands: []models.Command{helpCommand},
 		}
 	})
 
-	return helpInstance
+	return HelpInstance
 }
 
-// RouterProcess checks which command process to run given the inputed command & parameters
-func (hcr *HelpCommandRouter) RouterProcess(params []string) error {
+// Process checks which command process to run given the inputed command & parameters
+func (hcr *helpCommandRouter) Process(params []string) error {
 	cm, ok := slices.FilterInterface(hcr.Commands, func(cm interface{}) bool {
 		cmd, ok := cm.(models.Command)
 		return (params[0] == cmd.Command) && ok
