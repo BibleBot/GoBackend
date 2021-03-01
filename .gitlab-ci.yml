@@ -3,7 +3,6 @@ variables:
 
 include:
     - template: Code-Quality.gitlab-ci.yml
-    - template: Code-Intelligence.gitlab-ci.yml
 
 stages:
     - build
@@ -71,8 +70,18 @@ push:prod:tag:
         - docker tag $CI_REGISTRY_IMAGE:prod-latest $CI_REGISTRY_IMAGE:prod-$CI_COMMIT_REF_NAME
         - docker push $CI_REGISTRY_IMAGE:prod-$CI_COMMIT_REF_NAME
 
+code_navigation:
+    stage: test
+    image: sourcegraph/lsif-go:v1
+    allow_failure: true # recommended
+    script:
+        - lsif-go
+    artifacts:
+        reports:
+        lsif: dump.lsif
+
 test:
-    needs: ["code_quality", "code_intelligence_go"]
+    needs: ["code_quality", "code_navigation"]
     image: golang:1.16
     stage: test
     script:
