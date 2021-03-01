@@ -81,7 +81,6 @@ code_navigation:
             lsif: dump.lsif
 
 test:
-    needs: ["code_quality", "code_navigation"]
     image: golang:1.16
     stage: test
     script:
