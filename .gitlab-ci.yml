@@ -78,7 +78,7 @@ code_navigation:
         - lsif-go
     artifacts:
         reports:
-        lsif: dump.lsif
+            lsif: dump.lsif
 
 test:
     needs: ["code_quality", "code_navigation"]
