@@ -7,6 +7,7 @@ include:
 stages:
     - build
     - push
+    - audit
     - test
 
 build:dev:
@@ -70,8 +71,11 @@ push:prod:tag:
         - docker tag $CI_REGISTRY_IMAGE:prod-latest $CI_REGISTRY_IMAGE:prod-$CI_COMMIT_REF_NAME
         - docker push $CI_REGISTRY_IMAGE:prod-$CI_COMMIT_REF_NAME
 
+code_quality:
+    stage: audit
+
 code_navigation:
-    stage: test
+    stage: audit
     image: sourcegraph/lsif-go:v1
     allow_failure: true # recommended
     script:
