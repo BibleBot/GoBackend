@@ -7,13 +7,14 @@ import (
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/slices"
 )
 
-type helpCommandRouter struct {
+// HelpCommandRouter is a basic struct with functions to handle help-related commands.
+type HelpCommandRouter struct {
 	Commands []models.Command
 }
 
 var (
-	// HelpInstance is the singleton router used to process its respective commands
-	HelpInstance *helpCommandRouter
+	// helpInstance is the singleton router used to process its respective commands
+	helpInstance *HelpCommandRouter
 	helpOnce     sync.Once
 
 	helpCommand = models.Command{
@@ -24,19 +25,19 @@ var (
 	}
 )
 
-// NewHelpCommandRouter creates a helpCommandRouter if one does not already exist
-func NewHelpCommandRouter() *helpCommandRouter {
+// NewHelpCommandRouter creates a HelpCommandRouter if one does not already exist
+func NewHelpCommandRouter() *HelpCommandRouter {
 	helpOnce.Do(func() {
-		HelpInstance = &helpCommandRouter{
+		helpInstance = &HelpCommandRouter{
 			Commands: []models.Command{helpCommand},
 		}
 	})
 
-	return HelpInstance
+	return helpInstance
 }
 
 // Process checks which command process to run given the inputed command & parameters
-func (cr *helpCommandRouter) Process(params []string) error {
+func (cr *HelpCommandRouter) Process(params []string) error {
 	cm, ok := slices.FilterInterface(cr.Commands, func(cm interface{}) bool {
 		cmd, ok := cm.(models.Command)
 		return (params[0] == cmd.Command) && ok
@@ -47,9 +48,4 @@ func (cr *helpCommandRouter) Process(params []string) error {
 		return cm.Process(params[1:])
 	}
 	return nil // Implement return error
-}
-
-// Handles help commands.
-func router() {
-	return
 }

@@ -7,14 +7,15 @@ import (
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/slices"
 )
 
-type versionsCommandRouter struct {
+// VersionCommandRouter is a basic struct with functions to handle version-related commands.
+type VersionCommandRouter struct {
 	Commands []models.Command
 }
 
 var (
-	// VersionsInstance is the singleton router used to process its respective commands
-	VersionsInstance *versionsCommandRouter
-	versionsOnce     sync.Once
+	// versionInstance is the singleton router used to process its respective commands
+	versionInstance *VersionCommandRouter
+	versionOnce     sync.Once
 
 	versionsCommand = models.Command{
 		Command: "version",
@@ -24,19 +25,19 @@ var (
 	}
 )
 
-// NewVersionsCommandRouter creates a versionsCommandRouter if one does not already exist
-func NewVersionsCommandRouter() *versionsCommandRouter {
-	versionsOnce.Do(func() {
-		VersionsInstance = &versionsCommandRouter{
+// NewVersionCommandRouter creates a VersionCommandRouter if one does not already exist
+func NewVersionCommandRouter() *VersionCommandRouter {
+	versionOnce.Do(func() {
+		versionInstance = &VersionCommandRouter{
 			Commands: []models.Command{versionsCommand},
 		}
 	})
 
-	return VersionsInstance
+	return versionInstance
 }
 
 // Process checks which command process to run given the inputed command & parameters
-func (cr *versionsCommandRouter) Process(params []string) error {
+func (cr *VersionCommandRouter) Process(params []string) error {
 	cm, ok := slices.FilterInterface(cr.Commands, func(cm interface{}) bool {
 		cmd, ok := cm.(models.Command)
 		return (params[0] == cmd.Command) && ok
@@ -47,9 +48,4 @@ func (cr *versionsCommandRouter) Process(params []string) error {
 		return cm.Process(params[1:])
 	}
 	return nil // Implement return error
-}
-
-// Handles all version-related commands.
-func versions() {
-	return
 }

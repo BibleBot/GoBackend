@@ -7,13 +7,14 @@ import (
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/slices"
 )
 
-type dailyVerseCommandRouter struct {
+// DailyVerseCommandRouter is a basic struct with functions to handle daily verse-related commands.
+type DailyVerseCommandRouter struct {
 	Commands []models.Command
 }
 
 var (
-	// DailyVerseInstance is the singleton router used to process its respective commands
-	DailyVerseInstance *dailyVerseCommandRouter
+	// dailyVerseInstance is the singleton router used to process its respective commands
+	dailyVerseInstance *DailyVerseCommandRouter
 	dailyVerseOnce     sync.Once
 
 	dailyVerseCommand = models.Command{
@@ -24,19 +25,19 @@ var (
 	}
 )
 
-// NewDailyVerseCommandRouter creates a dailyVerseCommandRouter if one does not already exist
-func NewDailyVerseCommandRouter() *dailyVerseCommandRouter {
+// NewDailyVerseCommandRouter creates a DailyVerseCommandRouter if one does not already exist
+func NewDailyVerseCommandRouter() *DailyVerseCommandRouter {
 	dailyVerseOnce.Do(func() {
-		DailyVerseInstance = &dailyVerseCommandRouter{
+		dailyVerseInstance = &DailyVerseCommandRouter{
 			Commands: []models.Command{dailyVerseCommand},
 		}
 	})
 
-	return DailyVerseInstance
+	return dailyVerseInstance
 }
 
 // Process checks which command process to run given the inputed command & parameters
-func (cr *dailyVerseCommandRouter) Process(params []string) error {
+func (cr *DailyVerseCommandRouter) Process(params []string) error {
 	cm, ok := slices.FilterInterface(cr.Commands, func(cm interface{}) bool {
 		cmd, ok := cm.(models.Command)
 		return (params[0] == cmd.Command) && ok
@@ -47,9 +48,4 @@ func (cr *dailyVerseCommandRouter) Process(params []string) error {
 		return cm.Process(params[1:])
 	}
 	return nil // Implement return error
-}
-
-// Handles the daily verse command and anything related to it.
-func dailyVerse() {
-	return
 }

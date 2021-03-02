@@ -7,14 +7,15 @@ import (
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/slices"
 )
 
-type resourcesCommandRouter struct {
+// ResourceCommandRouter is a basic struct with functions to handle resource-related commands.
+type ResourceCommandRouter struct {
 	Commands []models.Command
 }
 
 var (
-	// ResourcesInstance is the singleton router used to process its respective commands
-	ResourcesInstance *resourcesCommandRouter
-	resourcesOnce     sync.Once
+	// resourceInstance is the singleton router used to process its respective commands
+	resourceInstance *ResourceCommandRouter
+	resourceOnce     sync.Once
 
 	creedsCommand = models.Command{
 		Command: "creeds",
@@ -48,10 +49,10 @@ var (
 	}
 )
 
-// NewResourcesCommandRouter creates a resourcesCommandRouter if one does not already exist
-func NewResourcesCommandRouter() *resourcesCommandRouter {
-	resourcesOnce.Do(func() {
-		ResourcesInstance = &resourcesCommandRouter{
+// NewResourceCommandRouter creates a ResourceCommandRouter if one does not already exist
+func NewResourceCommandRouter() *ResourceCommandRouter {
+	resourceOnce.Do(func() {
+		resourceInstance = &ResourceCommandRouter{
 			Commands: []models.Command{
 				creedsCommand,
 				apostlesCommand,
@@ -62,11 +63,11 @@ func NewResourcesCommandRouter() *resourcesCommandRouter {
 		}
 	})
 
-	return ResourcesInstance
+	return resourceInstance
 }
 
 // Process checks which command process to run given the inputed command & parameters
-func (cr *resourcesCommandRouter) Process(params []string) error {
+func (cr *ResourceCommandRouter) Process(params []string) error {
 	cm, ok := slices.FilterInterface(cr.Commands, func(cm interface{}) bool {
 		cmd, ok := cm.(models.Command)
 		return (params[0] == cmd.Command) && ok
@@ -77,9 +78,4 @@ func (cr *resourcesCommandRouter) Process(params []string) error {
 		return cm.Process(params[1:])
 	}
 	return nil // Implement return error
-}
-
-// Handles commands for the creeds and catechisms.
-func router() {
-	return
 }

@@ -7,13 +7,14 @@ import (
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/slices"
 )
 
-type formattingCommandRouter struct {
+// FormatCommandRouter is a basic struct with functions to handle format-related commands.
+type FormatCommandRouter struct {
 	Commands []models.Command
 }
 
 var (
-	// FormattingInstance is the singleton router used to process its respective commands
-	FormattingInstance *formattingCommandRouter
+	// formattingInstance is the singleton router used to process its respective commands
+	formattingInstance *FormatCommandRouter
 	formattingOnce     sync.Once
 
 	formattingCommand = models.Command{
@@ -24,19 +25,19 @@ var (
 	}
 )
 
-// NewFormattingCommandRouter creates a formattingCommandRouter if one does not already exist
-func NewFormattingCommandRouter() *formattingCommandRouter {
+// NewFormattingCommandRouter creates a FormatCommandRouter if one does not already exist
+func NewFormattingCommandRouter() *FormatCommandRouter {
 	formattingOnce.Do(func() {
-		FormattingInstance = &formattingCommandRouter{
+		formattingInstance = &FormatCommandRouter{
 			Commands: []models.Command{formattingCommand},
 		}
 	})
 
-	return FormattingInstance
+	return formattingInstance
 }
 
 // Process checks which command process to run given the inputed command & parameters
-func (cr *formattingCommandRouter) Process(params []string) error {
+func (cr *FormatCommandRouter) Process(params []string) error {
 	cm, ok := slices.FilterInterface(cr.Commands, func(cm interface{}) bool {
 		cmd, ok := cm.(models.Command)
 		return (params[0] == cmd.Command) && ok
@@ -47,9 +48,4 @@ func (cr *formattingCommandRouter) Process(params []string) error {
 		return cm.Process(params[1:])
 	}
 	return nil // Implement return error
-}
-
-// Handles all formatting-related commands - verse numbers, headings, and display styles.
-func formatting() {
-	return
 }

@@ -7,14 +7,15 @@ import (
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/slices"
 )
 
-type languagesCommandRouter struct {
+// LanguageCommandRouter is a basic struct with functions to handle language-related commands.
+type LanguageCommandRouter struct {
 	Commands []models.Command
 }
 
 var (
-	// LanguagesInstance is the singleton router used to process its respective commands
-	LanguagesInstance *languagesCommandRouter
-	languagesOnce     sync.Once
+	// languageInstance is the singleton router used to process its respective commands
+	languageInstance *LanguageCommandRouter
+	languageOnce     sync.Once
 
 	languagesCommand = models.Command{
 		Command: "language",
@@ -24,19 +25,19 @@ var (
 	}
 )
 
-// NewLanguagesCommandRouter creates a LanguagesCommandRouter if one does not already exist
-func NewLanguagesCommandRouter() *languagesCommandRouter {
-	languagesOnce.Do(func() {
-		LanguagesInstance = &languagesCommandRouter{
+// NewLanguageCommandRouter creates a LanguageCommandRouter if one does not already exist
+func NewLanguageCommandRouter() *LanguageCommandRouter {
+	languageOnce.Do(func() {
+		languageInstance = &LanguageCommandRouter{
 			Commands: []models.Command{languagesCommand},
 		}
 	})
 
-	return LanguagesInstance
+	return languageInstance
 }
 
 // Process checks which command process to run given the inputed command & parameters
-func (cr *languagesCommandRouter) Process(params []string) error {
+func (cr *LanguageCommandRouter) Process(params []string) error {
 	cm, ok := slices.FilterInterface(cr.Commands, func(cm interface{}) bool {
 		cmd, ok := cm.(models.Command)
 		return (params[0] == cmd.Command) && ok
@@ -47,9 +48,4 @@ func (cr *languagesCommandRouter) Process(params []string) error {
 		return cm.Process(params[1:])
 	}
 	return nil // Implement return error
-}
-
-// Handles all language-related commands. (Should be quite similar to versions.go as they basically do the same thing, give or take some)
-func languages() {
-	return
 }

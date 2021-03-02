@@ -7,14 +7,15 @@ import (
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/slices"
 )
 
-type versesCommandRouter struct {
+// VerseCommandRouter is a basic struct with functions to handle verse-related commands.
+type VerseCommandRouter struct {
 	Commands []models.Command
 }
 
 var (
-	// VersesInstance is the singleton router used to process its respective commands
-	VersesInstance *versesCommandRouter
-	versesOnce     sync.Once
+	// verseInstance is the singleton router used to process its respective commands
+	verseInstance *VerseCommandRouter
+	verseOnce     sync.Once
 
 	searchCommand = models.Command{
 		Command: "search",
@@ -36,10 +37,10 @@ var (
 	}
 )
 
-// NewVersesCommandRouter creates a versesCommandRouter if one does not already exist
-func NewVersesCommandRouter() *versesCommandRouter {
-	versesOnce.Do(func() {
-		VersesInstance = &versesCommandRouter{
+// NewVerseCommandRouter creates a VerseCommandRouter if one does not already exist
+func NewVerseCommandRouter() *VerseCommandRouter {
+	verseOnce.Do(func() {
+		verseInstance = &VerseCommandRouter{
 			Commands: []models.Command{
 				searchCommand,
 				randomCommand,
@@ -48,11 +49,11 @@ func NewVersesCommandRouter() *versesCommandRouter {
 		}
 	})
 
-	return VersesInstance
+	return verseInstance
 }
 
 // Process checks which command process to run given the inputed command & parameters
-func (cr *versesCommandRouter) Process(params []string) error {
+func (cr *VerseCommandRouter) Process(params []string) error {
 	cm, ok := slices.FilterInterface(cr.Commands, func(cm interface{}) bool {
 		cmd, ok := cm.(models.Command)
 		return (params[0] == cmd.Command) && ok
@@ -63,9 +64,4 @@ func (cr *versesCommandRouter) Process(params []string) error {
 		return cm.Process(params[1:])
 	}
 	return nil // Implement return error
-}
-
-// Handles verse lookups and random/truerandom verses.
-func verses() {
-	return
 }
