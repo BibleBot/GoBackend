@@ -21,13 +21,20 @@ import (
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/namefetcher"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/recover"
 	"gopkg.in/yaml.v2"
 
 	"golang.org/x/crypto/acme/autocert"
 )
 
 var version = "v1.0.0"
-var fiberConfig = fiber.Config{DisableStartupMessage: true}
+var fiberConfig = fiber.Config{
+	DisableStartupMessage: true,
+	ErrorHandler: func(c *fiber.Ctx, err error) error {
+		c.Status(fiber.StatusInternalServerError)
+		return c.SendString(err.Error())
+	},
+}
 
 func main() {
 	logger.LogInfo("init", fmt.Sprintf("BibleBot Backend %s by Kerygma Digital", version))
@@ -90,6 +97,7 @@ func SetupApp(isTest bool) (*fiber.App, *models.Config) {
 	// By default, we'll just serve a basic HTML page indicating what's running.
 	app := fiber.New(fiberConfig)
 	app.Static("/", "static")
+	app.Use(recover.New())
 
 	// Cables need not apply.
 	commands.RegisterRouter(app)
