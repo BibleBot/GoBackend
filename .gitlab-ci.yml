@@ -1,9 +1,6 @@
 variables:
     REPO_NAME: internal.kerygma.digital/kerygma-digital/biblebot/backend
 
-include:
-    - template: Code-Quality.gitlab-ci.yml
-
 stages:
     - build
     - push
