@@ -4,5 +4,5 @@ package models
 type Command struct {
 	Command string
 
-	Process func([]string) error
+	Process func([]string, *Context) (*CommandResponse, error)
 }

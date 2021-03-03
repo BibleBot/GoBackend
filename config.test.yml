@@ -3,6 +3,11 @@ ownerID: "" # Discord ID of owner
 apiBibleKey: "" # API.Bible key
 dry: true # should namefetcher skip itself?
 letsEncryptEmail: "" # Email for Let's Encrypt notifications.
+accessKey: "meowmix"
+databaseHost: "localhost"
+databasePort: 5432
+databaseUser: "biblebotinternal"
+databasePass: "dev"
 decryptionKey: "" # Applicable decryption key
 encryptedFiles:
   - "" # list all tar.zst.gpg files by name here

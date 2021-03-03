@@ -24,17 +24,30 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"gopkg.in/yaml.v2"
 
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	"gorm.io/gorm/schema"
+
 	"golang.org/x/crypto/acme/autocert"
 )
 
-var version = "v1.0.0"
-var fiberConfig = fiber.Config{
-	DisableStartupMessage: true,
-	ErrorHandler: func(c *fiber.Ctx, err error) error {
-		c.Status(fiber.StatusInternalServerError)
-		return c.SendString(err.Error())
-	},
-}
+var (
+	version = "v1.0.0"
+
+	fiberConfig = fiber.Config{
+		DisableStartupMessage: true,
+		ErrorHandler: func(c *fiber.Ctx, err error) error {
+			c.Status(fiber.StatusInternalServerError)
+			return c.SendString(err.Error())
+		},
+	}
+
+	gormConfig = &gorm.Config{
+		NamingStrategy: schema.NamingStrategy{
+			TablePrefix: "bb_",
+		},
+	}
+)
 
 func main() {
 	logger.LogInfo("init", fmt.Sprintf("BibleBot Backend %s by Kerygma Digital", version))
@@ -83,14 +96,28 @@ func SetupApp(isTest bool) (*fiber.App, *models.Config) {
 	// Create configuration from config.yml.
 	config := readConfig(isTest)
 
-	// Fetch book names.
 	if !isTest {
+		// Fetch book names.
 		namefetcher.FetchBookNames(config.APIBibleKey, config.IsDryRun, false)
+
+		// Connect to database and include it in the config.
+		dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s sslmode=disable TimeZone=America/New_York", config.DBHost, config.DBPort, config.DBUser, config.DBPass)
+		db, err := gorm.Open(postgres.Open(dsn), gormConfig)
+		if err != nil {
+			logger.LogWithError("setupapp", "error connecting to db", nil)
+			os.Exit(2)
+		}
+		config.DB = *db
+
+		// Migrate the appropriate models.
+		config.DB.AutoMigrate(&models.UserPreference{})
+		config.DB.AutoMigrate(&models.GuildPreference{})
 	}
 
 	// Extract all applicable data files.
 	err := extractData(config)
 	if err != nil {
+		logger.LogWithError("setupapp", "error extracting data", nil)
 		os.Exit(1)
 	}
 

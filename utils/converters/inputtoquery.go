@@ -8,14 +8,14 @@ import (
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/logger"
 )
 
-// InputToQuery takes a byte slice and attempts to convert it to a Query model.
-func InputToQuery(input []byte) (*models.Query, error) {
-	var query models.Query
+// InputToContext takes a byte slice and attempts to convert it to a Context model.
+func InputToContext(input []byte) (*models.Context, error) {
+	var context models.Context
 
-	err := json.Unmarshal(input, &query)
+	err := json.Unmarshal(input, &context)
 	if err != nil {
-		return nil, logger.LogWithError("inputtoquery", fmt.Sprintf("failed to convert %s to Query model", string(input)), err)
+		return nil, logger.LogWithError("inputtocontext", fmt.Sprintf("failed to convert %s to Context", string(input)), err)
 	}
 
-	return &query, nil
+	return &context, nil
 }

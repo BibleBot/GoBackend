@@ -30,7 +30,7 @@ func RegisterRouter(app *fiber.App, cfg *models.Config) {
 }
 
 func fetchVerse(c *fiber.Ctx) error {
-	query, err := processInput(c.Body())
+	ctx, err := processInput(c.Body())
 	if err != nil {
 		if err == fmt.Errorf("unauth") {
 			c.SendStatus(401)
@@ -41,7 +41,7 @@ func fetchVerse(c *fiber.Ctx) error {
 		return err
 	}
 
-	str, bookSearchResults := FindBooksInString(strings.ToLower(query.Body))
+	str, bookSearchResults := FindBooksInString(strings.ToLower(ctx.Body))
 
 	var verseResults []*models.Verse
 
@@ -58,7 +58,7 @@ func fetchVerse(c *fiber.Ctx) error {
 
 		var ver models.Version
 
-		switch query.TempVersion {
+		switch ctx.TempVersion {
 		case "RSV":
 			ver = rsv
 			break
@@ -101,8 +101,8 @@ func ProcessVerse(ref *models.Reference, titles bool, verseNumbers bool) (*model
 	return provider.GetVerse(ref, titles, verseNumbers)
 }
 
-func processInput(input []byte) (*models.Query, error) {
-	query, err := converters.InputToQuery(input)
+func processInput(input []byte) (*models.Context, error) {
+	context, err := converters.InputToContext(input)
 	if err != nil {
 		return nil, err
 	}
@@ -111,5 +111,5 @@ func processInput(input []byte) (*models.Query, error) {
 	//	return nil, errors.New("unauth")
 	//}
 
-	return query, nil
+	return context, nil
 }

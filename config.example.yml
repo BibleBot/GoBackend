@@ -2,6 +2,11 @@ ownerID: "" # Discord ID of owner
 apiBibleKey: "" # API.Bible key
 dry: false # should namefetcher skip itself?
 letsEncryptEmail: "" # Email for Let's Encrypt notifications.
+accessKey: "" # Authentication token expected in requests.
+databaseHost: "" # postgres host
+databasePort: 0000 # postgres port
+databaseUser: "user" # postgres user
+databasePass: "pass" # postgres password
 decryptionKey: "" # Applicable decryption key
 encryptedFiles:
   - "" # list all tar.zst.gpg files by name here
