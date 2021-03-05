@@ -30,7 +30,7 @@ func RegisterRouter(app *fiber.App, cfg *models.Config) {
 }
 
 func fetchVerse(c *fiber.Ctx) error {
-	ctx, err := processInput(c.Body())
+	ctx, err := converters.InputToContext(c.Body(), config)
 	if err != nil {
 		if err == fmt.Errorf("unauth") {
 			c.SendStatus(401)
@@ -99,17 +99,4 @@ func ProcessVerse(ref *models.Reference, titles bool, verseNumbers bool) (*model
 	}
 
 	return provider.GetVerse(ref, titles, verseNumbers)
-}
-
-func processInput(input []byte) (*models.Context, error) {
-	context, err := converters.InputToContext(input)
-	if err != nil {
-		return nil, err
-	}
-
-	//if query.Token != _config.AccessKey {
-	//	return nil, errors.New("unauth")
-	//}
-
-	return context, nil
 }

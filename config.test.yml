@@ -2,6 +2,7 @@
 ownerID: "" # Discord ID of owner
 apiBibleKey: "" # API.Bible key
 dry: true # should namefetcher skip itself?
+isTest: true
 letsEncryptEmail: "" # Email for Let's Encrypt notifications.
 accessKey: "meowmix"
 databaseHost: "localhost"

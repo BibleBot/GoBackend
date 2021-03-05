@@ -64,8 +64,9 @@ func TestBibleGatewayVerses(t *testing.T) {
 
 	for input, output := range inputToOutput {
 		input := map[string]string{
-			"body": input,
-			"ver":  "RSV",
+			"body":  input,
+			"ver":   "RSV",
+			"token": "meowmix",
 		}
 
 		b, err := json.Marshal(input)

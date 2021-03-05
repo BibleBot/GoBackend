@@ -5,7 +5,7 @@ import "gorm.io/gorm"
 // UserPreference is a model for user-based preferences.
 type UserPreference struct {
 	gorm.Model
-	UserID       string `json:"id"`
+	UserID       string `json:"userID"`
 	Input        string `json:"input"`
 	Language     string `json:"language"`
 	Version      string `json:"version"`
@@ -17,7 +17,7 @@ type UserPreference struct {
 // GuildPreference is a model for guild/DM-based preferences.
 type GuildPreference struct {
 	gorm.Model
-	GuildID          string `json:"id"`
+	GuildID          string `json:"guildID"`
 	Language         string `json:"language"`
 	Version          string `json:"version"`
 	Prefix           string `json:"fmtPrefix"`

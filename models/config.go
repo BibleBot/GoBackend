@@ -15,5 +15,6 @@ type Config struct {
 	DBPass           string   `yaml:"databasePass"`
 	DecryptionKey    string   `yaml:"decryptionKey"`
 	EncryptedFiles   []string `yaml:"encryptedFiles"`
+	IsTest           bool     `yaml:"isTest"`
 	DB               gorm.DB
 }
