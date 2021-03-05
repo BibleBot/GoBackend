@@ -2,9 +2,17 @@ variables:
     REPO_NAME: internal.kerygma.digital/kerygma-digital/biblebot/backend
 
 stages:
-    - build
-    - push
     - test
+    - build
+    - tag
+
+test:
+    image: golang:1.16
+    stage: test
+    script:
+        - go fmt $(go list ./... | grep -v /vendor/)
+        - go vet $(go list ./... | grep -v /vendor/)
+        - go test -v $(go list ./... | grep -v /vendor/)
 
 build:dev:
     image: docker:dind
@@ -37,10 +45,10 @@ build:prod:
           .
         - docker push $CI_REGISTRY_IMAGE:prod-latest
 
-push:dev:tag:
+tag:dev:
     needs: ["build:dev"]
     image: docker:dind
-    stage: push
+    stage: tag
     variables:
         GIT_STRATEGY: none
     only:
@@ -52,10 +60,10 @@ push:dev:tag:
         - docker tag $CI_REGISTRY_IMAGE:dev-latest $CI_REGISTRY_IMAGE:dev-$CI_COMMIT_REF_NAME
         - docker push $CI_REGISTRY_IMAGE:dev-$CI_COMMIT_REF_NAME
 
-push:prod:tag:
+tag:prod:
     needs: ["build:prod"]
     image: docker:dind
-    stage: push
+    stage: tag
     variables:
         GIT_STRATEGY: none
     only:
@@ -66,11 +74,3 @@ push:prod:tag:
         - docker pull $CI_REGISTRY_IMAGE:prod-latest
         - docker tag $CI_REGISTRY_IMAGE:prod-latest $CI_REGISTRY_IMAGE:prod-$CI_COMMIT_REF_NAME
         - docker push $CI_REGISTRY_IMAGE:prod-$CI_COMMIT_REF_NAME
-
-test:
-    image: golang:1.16
-    stage: test
-    script:
-        - go fmt $(go list ./... | grep -v /vendor/)
-        - go vet $(go list ./... | grep -v /vendor/)
-        - go test -v $(go list ./... | grep -v /vendor/)
