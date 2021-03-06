@@ -8,8 +8,13 @@ package commands
 import (
 	_ "embed" // for go:embeds
 	"encoding/json"
+	"fmt"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
+	"internal.kerygma.digital/kerygma-digital/biblebot/backend/models"
+	"internal.kerygma.digital/kerygma-digital/biblebot/backend/routes/commands/settings"
+	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/converters"
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/slices"
 )
 
@@ -18,17 +23,35 @@ var (
 	commandListFile []byte
 
 	commandList = make(map[string][]string)
+
+	config *models.Config
+
+	vcr = settings.NewVersionCommandRouter()
 )
 
 // RegisterRouter registers routers related to command processing.
-func RegisterRouter(app *fiber.App) {
-	app.Get("/api/commands/:input/:args?", commandHandler)
+func RegisterRouter(app *fiber.App, cfg *models.Config) {
+	config = cfg
+
+	app.Get("/api/commands/process", commandHandler)
 }
 
 func commandHandler(c *fiber.Ctx) error {
 	// Check prefix before creating command struct and calling Process()
+	ctx, err := converters.InputToContext(c.Body(), config)
+	if err != nil {
+		if err == fmt.Errorf("unauth") {
+			c.SendStatus(401)
+		} else {
+			c.SendStatus(400)
+		}
 
-	return c.SendString(c.Params("input"))
+		return err
+	}
+
+	res := vcr.Process(strings.Split(ctx.Body, " ")[1:], ctx)
+
+	return c.JSON(res)
 }
 
 func isValidCommand(cm string) bool {

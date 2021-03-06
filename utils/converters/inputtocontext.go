@@ -24,9 +24,9 @@ func InputToContext(input []byte, cfg *models.Config) (*models.Context, error) {
 	context.DB = cfg.DB
 
 	if !cfg.IsTest {
-		context.DB.Where(&models.UserPreference{UserID: context.UserID}).First(context.Prefs)
-		context.DB.Where(&models.GuildPreference{GuildID: context.GuildID}).First(context.GuildPrefs)
-		context.DB.Where(&models.Language{RawName: context.Prefs.Language}).First(context.Language)
+		context.DB.Where(&models.UserPreference{UserID: context.UserID}).First(&context.Prefs)
+		context.DB.Where(&models.GuildPreference{GuildID: context.GuildID}).First(&context.GuildPrefs)
+		//context.DB.Where(&models.Language{RawName: context.Prefs.Language}).First(context.Language)
 	}
 
 	return &context, nil

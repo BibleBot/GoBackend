@@ -16,6 +16,7 @@ import (
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/routes/commands"
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/routes/verses"
 
+	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/dbimports"
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/extractdata"
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/logger"
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/namefetcher"
@@ -53,6 +54,8 @@ func main() {
 	logger.LogInfo("init", fmt.Sprintf("BibleBot Backend %s by Kerygma Digital", version))
 
 	app, config := SetupApp(false)
+
+	dbimports.ImportVersions(&config.DB)
 
 	// Set up HTTPS based on domain argument.
 	var domain string
@@ -112,6 +115,7 @@ func SetupApp(isTest bool) (*fiber.App, *models.Config) {
 		// Migrate the appropriate models.
 		config.DB.AutoMigrate(&models.UserPreference{})
 		config.DB.AutoMigrate(&models.GuildPreference{})
+		config.DB.AutoMigrate(&models.Version{})
 	}
 
 	// Extract all applicable data files.
@@ -127,7 +131,7 @@ func SetupApp(isTest bool) (*fiber.App, *models.Config) {
 	app.Use(recover.New())
 
 	// Cables need not apply.
-	commands.RegisterRouter(app)
+	commands.RegisterRouter(app, config)
 	verses.RegisterRouter(app, config)
 
 	return app, config
