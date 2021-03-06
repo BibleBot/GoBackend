@@ -36,7 +36,7 @@ func NewResourceCommandRouter() *ResourceCommandRouter {
 }
 
 // Process checks which command process to run given the inputed command & parameters
-func (cr *ResourceCommandRouter) Process(params []string, ctx *models.Context) (*models.CommandResponse, error) {
+func (cr *ResourceCommandRouter) Process(params []string, ctx *models.Context) *models.CommandResponse {
 	cm, ok := slices.FilterInterface(cr.Commands, func(cm interface{}) bool {
 		cmd, ok := cm.(models.Command)
 		return (params[0] == cmd.Command) && ok
@@ -46,40 +46,40 @@ func (cr *ResourceCommandRouter) Process(params []string, ctx *models.Context) (
 		// Strip first element of slice (is the command itself)
 		return cm.Process(params[1:], ctx)
 	}
-	return nil, nil // Implement return error
+	return nil
 }
 
 var creedsCommand = models.Command{
 	Command: "creeds",
-	Process: func(params []string, ctx *models.Context) (*models.CommandResponse, error) {
-		return nil, nil // To implement
+	Process: func(params []string, ctx *models.Context) *models.CommandResponse {
+		return nil
 	},
 }
 
 var apostlesCommand = models.Command{
 	Command: "apostles",
-	Process: func(params []string, ctx *models.Context) (*models.CommandResponse, error) {
-		return nil, nil // To implement
+	Process: func(params []string, ctx *models.Context) *models.CommandResponse {
+		return nil
 	},
 }
 
 var nicene325Command = models.Command{
 	Command: "nicene325",
-	Process: func(params []string, ctx *models.Context) (*models.CommandResponse, error) {
-		return nil, nil // To implement
+	Process: func(params []string, ctx *models.Context) *models.CommandResponse {
+		return nil
 	},
 }
 
 var niceneCommand = models.Command{
 	Command: "nicene",
-	Process: func(params []string, ctx *models.Context) (*models.CommandResponse, error) {
-		return nil, nil // To implement
+	Process: func(params []string, ctx *models.Context) *models.CommandResponse {
+		return nil
 	},
 }
 
 var chalcedonCommand = models.Command{
 	Command: "chalcedon",
-	Process: func(params []string, ctx *models.Context) (*models.CommandResponse, error) {
-		return nil, nil // To implement
+	Process: func(params []string, ctx *models.Context) *models.CommandResponse {
+		return nil
 	},
 }

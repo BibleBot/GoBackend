@@ -19,20 +19,20 @@ var (
 
 	searchCommand = models.Command{
 		Command: "search",
-		Process: func(params []string, ctx *models.Context) (*models.CommandResponse, error) {
-			return nil, nil // To implement
+		Process: func(params []string, ctx *models.Context) *models.CommandResponse {
+			return nil
 		},
 	}
 	randomCommand = models.Command{
 		Command: "random",
-		Process: func(params []string, ctx *models.Context) (*models.CommandResponse, error) {
-			return nil, nil // To implement
+		Process: func(params []string, ctx *models.Context) *models.CommandResponse {
+			return nil
 		},
 	}
 	truerandomCommand = models.Command{
 		Command: "truerandom",
-		Process: func(params []string, ctx *models.Context) (*models.CommandResponse, error) {
-			return nil, nil // To implement
+		Process: func(params []string, ctx *models.Context) *models.CommandResponse {
+			return nil
 		},
 	}
 )
@@ -53,7 +53,7 @@ func NewVerseCommandRouter() *VerseCommandRouter {
 }
 
 // Process checks which command process to run given the inputed command & parameters
-func (cr *VerseCommandRouter) Process(params []string, ctx *models.Context) (*models.CommandResponse, error) {
+func (cr *VerseCommandRouter) Process(params []string, ctx *models.Context) *models.CommandResponse {
 	cm, ok := slices.FilterInterface(cr.Commands, func(cm interface{}) bool {
 		cmd, ok := cm.(models.Command)
 		return (params[0] == cmd.Command) && ok
@@ -63,5 +63,5 @@ func (cr *VerseCommandRouter) Process(params []string, ctx *models.Context) (*mo
 		// Strip first element of slice (is the command itself)
 		return cm.Process(params[1:], ctx)
 	}
-	return nil, nil // Implement return error
+	return nil
 }

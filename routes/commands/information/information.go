@@ -19,8 +19,8 @@ var (
 
 	helpCommand = models.Command{
 		Command: "biblebot",
-		Process: func(params []string, ctx *models.Context) (*models.CommandResponse, error) {
-			return nil, nil // To implement
+		Process: func(params []string, ctx *models.Context) *models.CommandResponse {
+			return nil
 		},
 	}
 )
@@ -37,7 +37,7 @@ func NewHelpCommandRouter() *HelpCommandRouter {
 }
 
 // Process checks which command process to run given the inputed command & parameters
-func (cr *HelpCommandRouter) Process(params []string, ctx *models.Context) (*models.CommandResponse, error) {
+func (cr *HelpCommandRouter) Process(params []string, ctx *models.Context) *models.CommandResponse {
 	cm, ok := slices.FilterInterface(cr.Commands, func(cm interface{}) bool {
 		cmd, ok := cm.(models.Command)
 		return (params[0] == cmd.Command) && ok
@@ -47,5 +47,5 @@ func (cr *HelpCommandRouter) Process(params []string, ctx *models.Context) (*mod
 		// Strip first element of slice (is the command itself)
 		return cm.Process(params[1:], ctx)
 	}
-	return nil, nil // Implement return error
+	return nil
 }
