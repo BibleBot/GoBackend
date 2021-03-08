@@ -8,7 +8,6 @@ package commands
 import (
 	_ "embed" // for go:embeds
 	"encoding/json"
-	"fmt"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
@@ -40,11 +39,7 @@ func commandHandler(c *fiber.Ctx) error {
 	// Check prefix before creating command struct and calling Process()
 	ctx, err := converters.InputToContext(c.Body(), config)
 	if err != nil {
-		if err == fmt.Errorf("invalid API key") {
-			c.SendStatus(401)
-		} else {
-			c.SendStatus(400)
-		}
+		c.SendStatus(401)
 
 		return c.JSON(&models.CommandResponse{
 			OK:      false,
