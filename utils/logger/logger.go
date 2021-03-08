@@ -57,7 +57,7 @@ func LogWarn(source string, message string) error {
 func LogWithError(source string, msg string, err error) error {
 	log("err", source, msg)
 
-	if err != nil {
+	if err == nil {
 		return errors.New(msg)
 	}
 

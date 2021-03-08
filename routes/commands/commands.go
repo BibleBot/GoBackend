@@ -40,13 +40,16 @@ func commandHandler(c *fiber.Ctx) error {
 	// Check prefix before creating command struct and calling Process()
 	ctx, err := converters.InputToContext(c.Body(), config)
 	if err != nil {
-		if err == fmt.Errorf("unauth") {
+		if err == fmt.Errorf("invalid API key") {
 			c.SendStatus(401)
 		} else {
 			c.SendStatus(400)
 		}
 
-		return err
+		return c.JSON(&models.CommandResponse{
+			OK:      false,
+			Content: err.Error(),
+		})
 	}
 
 	res := vcr.Process(strings.Split(ctx.Body, " ")[1:], ctx)
