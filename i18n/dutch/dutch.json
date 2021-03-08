@@ -102,7 +102,7 @@
     "donorsNotListed": "En die niet vermeld staan!",
     "addversionsuccess": "Toegevoegde versie succesvol.",
     "verseerror": "Verwerkingsfout",
-    "invalidsection": "De versie die u gebruikt ondersteunt dit deel van de Bijbel niet.",
+    "invalidsection": "De versie die je gebruikt ondersteunt dit deel van de Bijbel niet.",
     "enabled": "ingeschakeld",
     "disabled": "uitgeschakeld",
     "author": "door <author>\n\n",
@@ -138,14 +138,14 @@
         "setbrackets": "negeerhaakjes",
         "clear": "wis",
         "nicene": "niceense",
-        "nicene325": "nicene325",
+        "nicene325": "nicaea325",
         "apostles": "apostelen",
         "chalcedon": "chalcedon",
         "creeds": "geloofsbelijdenissen",
         "resources": "resources",
         "announcements": "aankondigingen",
         "announce": "aankondigen",
-        "misc": "misc",
+        "misc": "overig",
         "invite": "uitnodiging",
         "supporters": "supporters"
     },
@@ -154,7 +154,7 @@
         "no": "Nee",
         "enable": "inschakelen",
         "disable": "uitschakelen",
-        "true": "true",
-        "false": "false"
+        "true": "waar",
+        "false": "onwaar"
     }
 }
