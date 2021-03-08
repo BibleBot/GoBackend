@@ -38,9 +38,9 @@ func (cr *VersionCommandRouter) Process(params []string, ctx *models.Context) *m
 		if len(params) > 0 {
 			cmd, ok := cm.(models.Command)
 			return (params[0] == cmd.Command) && ok
-		} else {
-			return false
 		}
+
+		return false
 	}).([]models.Command)
 
 	var cm models.Command
@@ -51,11 +51,11 @@ func (cr *VersionCommandRouter) Process(params []string, ctx *models.Context) *m
 		cm = cmMatches[0]
 	}
 
-	if len(params) > 0 {
-		return cm.Process(params[1:], ctx)
-	} else {
+	if len(params) == 0 {
 		return cm.Process([]string{}, ctx)
 	}
+
+	return cm.Process(params[1:], ctx)
 }
 
 var cmDefault = models.Command{
