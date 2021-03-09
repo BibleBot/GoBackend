@@ -49,3 +49,17 @@ func (cr *FormatCommandRouter) Process(params []string, ctx *models.Context) *mo
 	}
 	return nil
 }
+
+// Set guild prefix
+
+// Set guild brackets (<>, [], {}, ()) <- allow more than one?
+
+// Get guild preferences (prefix, brackets)
+
+// Set user headings (true, false)
+
+// Set user verse numbers (true, false)
+
+// Set user display style (default, embed, blockquote, code)
+
+// Get user preferences (headings, verse numbers, display style)
