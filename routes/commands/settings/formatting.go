@@ -4,7 +4,7 @@ import (
 	"sync"
 
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/models"
-	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/slices"
+	// "internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/slices"
 )
 
 // FormatCommandRouter is a basic struct with functions to handle format-related commands.
@@ -38,15 +38,20 @@ func NewFormattingCommandRouter() *FormatCommandRouter {
 
 // Process checks which command process to run given the inputed command & parameters
 func (cr *FormatCommandRouter) Process(params []string, ctx *models.Context) *models.CommandResponse {
+	/* Not required since formatting only handles one command (?)
 	cm, ok := slices.FilterInterface(cr.Commands, func(cm interface{}) bool {
 		cmd, ok := cm.(models.Command)
 		return (params[0] == cmd.Command) && ok
-	}).(models.Command)
+	}).([]models.Command)
 
 	if ok {
 		// Strip first element of slice (is the command itself)
 		return cm.Process(params[1:], ctx)
+	}*/
+	if cr.Commands[0].Command == params[0] {
+		return cr.Commands[0].Process(params[1:], ctx)
 	}
+
 	return nil
 }
 
