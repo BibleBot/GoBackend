@@ -1,13 +1,16 @@
 variables:
     REPO_NAME: internal.kerygma.digital/kerygma-digital/biblebot/backend
 
+services:
+    - postgres:13-alpine
+
 stages:
     - test
     - build
     - tag
 
 test:
-    image: golang:1.16
+    image: golang:1.16-alpine
     stage: test
     script:
         - go fmt $(go list ./... | grep -v /vendor/)

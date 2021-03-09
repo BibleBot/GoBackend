@@ -55,8 +55,6 @@ func main() {
 
 	app, config := SetupApp(false)
 
-	dbimports.ImportVersions(&config.DB)
-
 	// Set up HTTPS based on domain argument.
 	var domain string
 	if len(os.Args) != 2 {
@@ -102,24 +100,27 @@ func SetupApp(isTest bool) (*fiber.App, *models.Config) {
 	if !isTest {
 		// Fetch book names.
 		namefetcher.FetchBookNames(config.APIBibleKey, config.IsDryRun, false)
-
-		// Connect to database and include it in the config.
-		dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s sslmode=disable TimeZone=America/New_York", config.DBHost, config.DBPort, config.DBUser, config.DBPass)
-		db, err := gorm.Open(postgres.Open(dsn), gormConfig)
-		if err != nil {
-			logger.LogWithError("setupapp", "error connecting to db", nil)
-			os.Exit(2)
-		}
-		config.DB = *db
-
-		// Migrate the appropriate models.
-		config.DB.AutoMigrate(&models.UserPreference{})
-		config.DB.AutoMigrate(&models.GuildPreference{})
-		config.DB.AutoMigrate(&models.Version{})
 	}
 
+	// Connect to database and include it in the config.
+	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s sslmode=disable TimeZone=America/New_York", config.DBHost, config.DBPort, config.DBUser, config.DBPass)
+	db, err := gorm.Open(postgres.Open(dsn), gormConfig)
+	if err != nil {
+		logger.LogWithError("setupapp", "error connecting to db", nil)
+		os.Exit(2)
+	}
+	config.DB = *db
+
+	// Migrate the appropriate models.
+	config.DB.AutoMigrate(&models.UserPreference{})
+	config.DB.AutoMigrate(&models.GuildPreference{})
+	config.DB.AutoMigrate(&models.Version{})
+
+	// Import old DBs.
+	dbimports.ImportVersions(&config.DB)
+
 	// Extract all applicable data files.
-	err := extractData(config)
+	err = extractData(config)
 	if err != nil {
 		logger.LogWithError("setupapp", "error extracting data", nil)
 		os.Exit(1)
