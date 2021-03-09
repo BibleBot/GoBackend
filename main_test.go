@@ -46,8 +46,12 @@ func TestBibleGatewayVerses(t *testing.T) {
 					EndingChapter:   3,
 					EndingVerse:     0,
 					Version: models.Version{
-						Abbreviation: "RSV",
-						Source:       "bg",
+						Name:                 "Revised Standard Version (RSV)",
+						Abbreviation:         "RSV",
+						Source:               "bg",
+						SupportsOldTestament: true,
+						SupportsNewTestament: true,
+						SupportsDeuterocanon: true,
 					},
 
 					IsOT:  true,
