@@ -2,6 +2,7 @@ package settings
 
 import (
 	"fmt"
+	"sort"
 	"sync"
 
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/models"
@@ -24,8 +25,8 @@ var (
 func NewVersionCommandRouter() *VersionCommandRouter {
 	versionOnce.Do(func() {
 		versionInstance = &VersionCommandRouter{
-			DefaultCommand: cmDefault,
-			Commands:       []models.Command{cmSet, cmSetServer},
+			DefaultCommand: verDefault,
+			Commands:       []models.Command{verSet, verSetServer},
 		}
 	})
 
@@ -44,7 +45,6 @@ func (cr *VersionCommandRouter) Process(params []string, ctx *models.Context) *m
 	}).([]models.Command)
 
 	var cm models.Command
-
 	if len(cmMatches) == 0 {
 		cm = cr.DefaultCommand
 	} else {
@@ -58,7 +58,7 @@ func (cr *VersionCommandRouter) Process(params []string, ctx *models.Context) *m
 	return cm.Process(params[1:], ctx)
 }
 
-var cmDefault = models.Command{
+var verDefault = models.Command{
 	Command: "version",
 	Process: func(_ []string, ctx *models.Context) *models.CommandResponse {
 		fmt.Println(ctx.Prefs)
@@ -82,7 +82,7 @@ var cmDefault = models.Command{
 	},
 }
 
-var cmSet = models.Command{
+var verSet = models.Command{
 	Command: "set",
 	Process: func(params []string, ctx *models.Context) *models.CommandResponse {
 		var idealVersion models.Version
@@ -115,7 +115,7 @@ var cmSet = models.Command{
 	},
 }
 
-var cmSetServer = models.Command{
+var verSetServer = models.Command{
 	Command: "setserver",
 	Process: func(params []string, ctx *models.Context) *models.CommandResponse {
 		var idealVersion models.Version
@@ -138,12 +138,40 @@ var cmSetServer = models.Command{
 			}
 
 			response.OK = true
-			response.Content = "set version"
+			response.Content = "set server version"
 		} else {
 			response.OK = false
 			response.Content = "can't find version"
 		}
 
 		return &response
+	},
+}
+
+var verList = models.Command{
+	Command: "list",
+	Process: func(_ []string, ctx *models.Context) *models.CommandResponse {
+		var versions []models.Version
+		ctx.DB.Find(&versions)
+
+		// Sort versions alphabetically.
+		sort.SliceStable(versions, func(i, j int) bool {
+			return versions[i].Name < versions[j].Name
+		})
+
+		/*var pages []string
+		var maxResultsPerPage = 25
+		var versionsUsed []models.Version
+		totalPages := math.Ceil(len(versions) / maxResultsPerPage)
+
+		if totalPages == 0 {
+			totalPages = 1
+		}
+
+		for i := range totalPages {
+			// TODO, finish this once languages are implemented
+		}*/
+
+		return &models.CommandResponse{}
 	},
 }
