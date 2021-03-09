@@ -1,8 +1,11 @@
-variables:
-    REPO_NAME: internal.kerygma.digital/kerygma-digital/biblebot/backend
-
 services:
     - postgres:13-alpine
+
+variables:
+    POSTGRES_DB: biblebotinternal
+    POSTGRES_USER: biblebotinternal
+    POSTGES_PASSWORD: dev
+    POSTGRES_HOST_AUTH_METHOD: trust
 
 stages:
     - test
@@ -10,7 +13,7 @@ stages:
     - tag
 
 test:
-    image: golang:1.16-alpine
+    image: golang:1.16
     stage: test
     script:
         - go fmt $(go list ./... | grep -v /vendor/)
