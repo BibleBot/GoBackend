@@ -46,33 +46,29 @@ func fetchVerse(c *fiber.Ctx) error {
 	var verseResults []*models.Verse
 
 	for _, bsr := range bookSearchResults {
-		rsv := models.Version{
-			Abbreviation: "RSV",
-			Source:       "bg",
-		}
-
-		kjva := models.Version{
-			Abbreviation: "KJVA",
-			Source:       "ab",
-		}
-
 		var ver models.Version
 
-		switch ctx.TempVersion {
-		case "RSV":
-			ver = rsv
-			break
-		case "KJVA":
-			ver = kjva
-			break
+		if ctx.Prefs.Version == "" {
+			if ctx.GuildPrefs.Version == "" {
+				ctx.Prefs.Version = "RSV"
+			} else {
+				ctx.Prefs.Version = ctx.GuildPrefs.Version
+			}
 		}
 
-		reference := GenerateReference(str, bsr, ver)
-		if reference == nil {
+		config.DB.Where(&models.Version{Abbreviation: ctx.Prefs.Version}).First(&ver)
+
+		ref := GenerateReference(str, bsr, ver)
+		if ref == nil {
 			continue
 		}
 
-		verse, err := ProcessVerse(reference, true, true)
+		if !versionSupportsSection(ver, ref) {
+			// TODO: make json response
+			return logger.LogWithError("fetchverse", fmt.Sprintf("%s cannot be accessed from %s", ref.ToString(), ref.Version.Abbreviation), nil)
+		}
+
+		verse, err := ProcessVerse(ref, true, true)
 		if err != nil {
 			return err
 		}
@@ -99,4 +95,14 @@ func ProcessVerse(ref *models.Reference, titles bool, verseNumbers bool) (*model
 	}
 
 	return provider.GetVerse(ref, titles, verseNumbers)
+}
+
+func versionSupportsSection(ver models.Version, ref *models.Reference) bool {
+	result := true
+
+	if (ref.IsOT && !ver.SupportsOldTestament) || (ref.IsNT && !ver.SupportsNewTestament) || (ref.IsDEU && !ver.SupportsDeuterocanon) {
+		result = false
+	}
+
+	return result
 }

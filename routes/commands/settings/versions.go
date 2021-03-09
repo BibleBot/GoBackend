@@ -122,12 +122,12 @@ var cmSetServer = models.Command{
 		var idealGuild models.GuildPreference
 
 		verResult := ctx.DB.Where(&models.Version{Abbreviation: params[0]}).First(&idealVersion)
-		userResult := ctx.DB.Where(&models.GuildPreference{GuildID: ctx.GuildID}).First(&idealGuild)
+		guildResult := ctx.DB.Where(&models.GuildPreference{GuildID: ctx.GuildID}).First(&idealGuild)
 
 		var response models.CommandResponse
 
 		if verResult.Error == nil && params[0] == idealVersion.Abbreviation {
-			if userResult.Error == nil {
+			if guildResult.Error == nil {
 				idealGuild.Version = params[0]
 				ctx.DB.Save(idealGuild)
 			} else {
