@@ -41,9 +41,6 @@ func NewAPIBibleProvider(key string) *APIBibleProvider {
 // GetVerse fetches a Verse based upon a Reference, for API.Bible versions.
 func (abp *APIBibleProvider) GetVerse(ref *models.Reference, titles bool, verseNumbers bool) (*models.Verse, error) {
 	URL, err := url.Parse(fmt.Sprintf("https://api.scripture.api.bible/v1/bibles/%s/search", versionTable[ref.Version.Abbreviation]))
-	if err != nil {
-		return nil, logger.LogWithError("apibible", "unable to create URL", err)
-	}
 
 	query := URL.Query()
 	query.Set("query", ref.ToString())
@@ -52,9 +49,6 @@ func (abp *APIBibleProvider) GetVerse(ref *models.Reference, titles bool, verseN
 
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", URL.String(), nil)
-	if err != nil {
-		return nil, logger.LogWithError("apibible", "unable to create request", err)
-	}
 	req.Header.Add("api-key", abp.Key)
 
 	resp, err := client.Do(req)
