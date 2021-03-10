@@ -6,6 +6,7 @@ variables:
     POSTGRES_USER: biblebotinternal
     POSTGES_PASSWORD: dev
     POSTGRES_HOST_AUTH_METHOD: trust
+    SAST_EXCLUDED_ANALYZERS: "eslint,flawfinder"
 
 include:
     - template: Container-Scanning.gitlab-ci.yml
