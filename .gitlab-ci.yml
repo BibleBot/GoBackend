@@ -7,7 +7,7 @@ variables:
     POSTGES_PASSWORD: dev
     POSTGRES_HOST_AUTH_METHOD: trust
     SAST_EXCLUDED_ANALYZERS: "eslint,flawfinder"
-    CI_APPLICATION_TAG: prod-latest
+    DOCKER_IMAGE: $CI_REGISTRY_IMAGE:prod-latest
 
 include:
     - template: Container-Scanning.gitlab-ci.yml
