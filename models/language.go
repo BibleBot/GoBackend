@@ -4,10 +4,11 @@ package models
 type Language struct {
 	Name      string
 	RawName   string
-	RawObject rawLanguage
+	RawObject RawLanguage
 }
 
-type rawLanguage struct {
+// RawLanguage is the raw JSON file as a Go struct.
+type RawLanguage struct {
 	BibleBot string `json:"biblebot"`
 	Credit   string `json:"credit"`
 
@@ -60,5 +61,141 @@ type rawLanguage struct {
 	InfoUsage             string `json:"infousage"`
 	ListVersionUsage      string `json:"listversionusage"`
 
-	// TODO finish
+	SetLanguageSuccess     string `json:"setlanguagesuccess"`
+	SetLanguageFail        string `json:"setlanguagefail"`
+	LanguageUsed           string `json:"languageused"`
+	SetLanguageUsage       string `json:"setlanguageusage"`
+	SetServerLanguageUsage string `json:"setserverlanguageusage"`
+	ListLanguageUsage      string `json:"listlanguageusage"`
+
+	PrefixOneChar     string `json:"prefixonechar"`
+	PrefixSuccess     string `json:"prefixsuccess"`
+	GuildPrefixUsed   string `json:"guildprefixused"`
+	GuildBracketsUsed string `json:"guildbracketsused"`
+	SetPrefixUsage    string `json:"setprefixsusage"`
+	SetBracketUsage   string `json:"setbracketsusage"`
+
+	SetVerseNumbersUsage string `json:"setversenumbersusage"`
+	SetHeadingsUsage     string `json:"setheadingsusage"`
+	SetDisplayUsage      string `json:"setdisplayusage"`
+	VerseNumbers         string `json:"versenumbers"`
+	VerseNumbersSuccess  string `json:"versenumberssuccess"`
+	Headings             string `json:"headings"`
+	HeadingsSuccess      string `json:"headingssuccess"`
+	OtherFormatFail      string `json:"otherformatfail"`
+	Formatting           string `json:"formatting"`
+	FormattingSuccess    string `json:"formattingsuccess"`
+	FormattingFail       string `json:"formattingfail"`
+
+	FailedSearch     string `json:"failedsearch"`
+	FailedPreference string `json:"failedpreference"`
+
+	NoGuildPerm             string `json:"noguildperm"`
+	SetGuildVersionSuccess  string `json:"setguildversionsuccess"`
+	SetGuildVersionFail     string `json:"setguildversionfail"`
+	SetGuildLanguageSuccess string `json:"setguildlanguagesuccess"`
+	SetGuildLanguageFail    string `json:"setguildlanguagefail"`
+	GuildLanguageUsed       string `json:"guildlanguageused"`
+	SetGuildBracketsSuccess string `json:"setguildbracketssuccess"`
+	GuildBracketsFail       string `json:"guildbracketsfail"`
+
+	SetVOTDTimeSuccess   string `json:"setvotdtimesuccess"`
+	VOTDTimeUsed         string `json:"votdtimeused"`
+	NoVOTDTimeUsed       string `json:"novotdtimeused"`
+	ClearVOTDTimeSuccess string `json:"clearvotdtimesuccess"`
+	VOTD                 string `json:"votd"`
+	VOTDCantProcess      string `json:"votdcantprocess"`
+
+	VersionInfo       string `json:"versioninfo"`
+	VersionInfoFailed string `json:"versioninfofailed"`
+
+	ExpectedParameter string `json:"expectedparameter"`
+	DonutSpam         string `json:"donutspam"`
+
+	ShardCount      string `json:"shardcount"`
+	CachedGuilds    string `json:"cachedguilds"`
+	CachedChannels  string `json:"cachedchannels"`
+	CachedUsers     string `json:"cachedusers"`
+	PreferenceCount string `json:"preferencecount"`
+	GuildPrefCount  string `json:"guildprefcount"`
+	VersionCount    string `json:"versioncount"`
+	LanguageCount   string `json:"languagecount"`
+	RunningOn       string `json:"runningon"`
+
+	QueryTooShort      string `json:"queryTooShort"`
+	SearchResults      string `json:"searchResults"`
+	NothingFound       string `json:"nothingFound"`
+	PageOf             string `json:"pageOf"`
+	SearchNotSupported string `json:"searchNotSupported"`
+
+	PlsWait         string `json:"plswait"`
+	Supporters      string `json:"supporters"`
+	AnonymousDonors string `json:"anonymousDonors"`
+	DonorsNotListed string `json:"donorsNotListed"`
+
+	AddVersionSuccess string `json:"addversionsuccess"`
+
+	VerseError     string `json:"verseerror"`
+	InvalidSection string `json:"invalidsection"`
+
+	Enabled  string `json:"enabled"`
+	Disabled string `json:"disabled"`
+
+	Author     string `json:"author"`
+	SinglePage string `json:"singlePage"`
+	Pages      string `json:"pages"`
+	Category   string `json:"category"`
+	Section    string `json:"section"`
+	Sections   string `json:"sections"`
+
+	Commands  []cmds `json:"commands"`
+	Arguments []args `json:"arguments"`
+}
+
+type cmds struct {
+	Search          string `json:"search"`
+	Version         string `json:"version"`
+	Set             string `json:"set"`
+	SetServer       string `json:"setserver"`
+	Setup           string `json:"setup"`
+	List            string `json:"list"`
+	Info            string `json:"info"`
+	Status          string `json:"status"`
+	DailyVerse      string `json:"dailyverse"`
+	Random          string `json:"random"`
+	TrueRandom      string `json:"truerandom"`
+	Formatting      string `json:"formatting"`
+	Stats           string `json:"stats"`
+	BibleBot        string `json:"biblebot"`
+	AddVersion      string `json:"addversion"`
+	RMVersion       string `json:"rmversion"`
+	SetVerseNumbers string `json:"setversenumbers"`
+	SetHeadings     string `json:"setheadings"`
+	SetDisplay      string `json:"setdisplay"`
+	Echo            string `json:"echo"`
+	Leave           string `json:"leave"`
+	Language        string `json:"language"`
+	SetPrefix       string `json:"setprefix"`
+	SetBrackets     string `json:"setbrackets"`
+	Clear           string `json:"clear"`
+	Nicene          string `json:"nicene"`
+	Nicene325       string `json:"nicene325"`
+	Apostles        string `json:"apostles"`
+	Chalcedon       string `json:"chalcedon"`
+	Creeds          string `json:"creeds"`
+	Resources       string `json:"resources"`
+	Announcements   string `json:"announcements"`
+	Announce        string `json:"announce"`
+	Misc            string `json:"misc"`
+	Invite          string `json:"invite"`
+	Supporters      string `json:"supporters"`
+}
+
+type args struct {
+	Yes     string `json:"yes"`
+	No      string `json:"no"`
+	Enable  string `json:"enable"`
+	Disable string `json:"disable"`
+	True    string `json:"true"`
+	False   string `json:"false"`
 }

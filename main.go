@@ -11,12 +11,13 @@ import (
 
 	"path/filepath"
 
+	"internal.kerygma.digital/kerygma-digital/biblebot/backend/data"
+	"internal.kerygma.digital/kerygma-digital/biblebot/backend/i18n"
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/models"
 
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/routes/commands"
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/routes/verses"
 
-	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/dbimports"
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/extractdata"
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/logger"
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/namefetcher"
@@ -115,9 +116,11 @@ func SetupApp(isTest bool) (*fiber.App, *models.Config) {
 	config.DB.AutoMigrate(&models.UserPreference{})
 	config.DB.AutoMigrate(&models.GuildPreference{})
 	config.DB.AutoMigrate(&models.Version{})
+	config.DB.AutoMigrate(&models.Language{})
 
-	// Import old DBs.
-	dbimports.ImportVersions(&config.DB)
+	// Import any applicable data into DBs.
+	data.ImportVersions(&config.DB)
+	i18n.ImportLanguages(&config.DB)
 
 	// Extract all applicable data files.
 	err = extractData(config)

@@ -1,4 +1,4 @@
-package dbimports
+package data
 
 import (
 	_ "embed" // for go:embed	"encoding/json"
@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	//go:embed data/versiondb.json
+	//go:embed oldversiondb.json
 	oldVersions []byte
 )
 
