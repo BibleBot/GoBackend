@@ -116,11 +116,10 @@ func SetupApp(isTest bool) (*fiber.App, *models.Config) {
 	config.DB.AutoMigrate(&models.UserPreference{})
 	config.DB.AutoMigrate(&models.GuildPreference{})
 	config.DB.AutoMigrate(&models.Version{})
-	config.DB.AutoMigrate(&models.Language{})
 
 	// Import any applicable data into DBs.
 	data.ImportVersions(&config.DB)
-	i18n.ImportLanguages(&config.DB)
+	config.Languages = i18n.ImportLanguages()
 
 	// Extract all applicable data files.
 	err = extractData(config)

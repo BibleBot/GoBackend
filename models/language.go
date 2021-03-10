@@ -1,7 +1,10 @@
 package models
 
+import "gorm.io/gorm"
+
 // Language is a type describing an interface language.
 type Language struct {
+	gorm.Model
 	Name      string
 	RawName   string
 	RawObject RawLanguage
