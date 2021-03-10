@@ -8,11 +8,12 @@ import (
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/models"
 )
 
+//go:embed english/english.json
+var englishRawObjectFile []byte
+
 // ImportLanguages imports the old JSON database into the new PGSQL one.
 func ImportLanguages(db *gorm.DB) {
 
-	//go:embed english/english.json
-	var englishRawObjectFile []byte
 	var englishRawObject models.RawLanguage
 	json.Unmarshal(englishRawObjectFile, &englishRawObject)
 
