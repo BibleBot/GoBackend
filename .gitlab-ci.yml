@@ -6,13 +6,11 @@ variables:
     POSTGRES_USER: biblebotinternal
     POSTGES_PASSWORD: dev
     POSTGRES_HOST_AUTH_METHOD: trust
-    SAST_EXCLUDED_ANALYZERS: "eslint,flawfinder"
     DOCKER_IMAGE: $CI_REGISTRY_IMAGE:prod-latest
 
 include:
     - template: Container-Scanning.gitlab-ci.yml
     - template: Dependency-Scanning.gitlab-ci.yml
-    - template: Security/SAST.gitlab-ci.yml
     - template: Code-Quality.gitlab-ci.yml
 
 stages:
