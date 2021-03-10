@@ -14,8 +14,8 @@ include:
     - template: Code-Quality.gitlab-ci.yml
 
 stages:
-    - test
     - build
+    - test
     - tag
 
 test:
