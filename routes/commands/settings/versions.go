@@ -3,6 +3,7 @@ package settings
 import (
 	"fmt"
 	"sort"
+	"strings"
 	"sync"
 
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/models"
@@ -105,10 +106,16 @@ var verSet = models.Command{
 			}
 
 			response.OK = true
-			response.Content = "set version"
+			response.Content = ctx.Language.GetString("SetVersionSuccess")
 		} else {
 			response.OK = false
-			response.Content = "can't find version"
+
+			content := ctx.Language.GetString("SetVersionFail")
+			content = strings.Replace(content, "<+>", ctx.GuildPrefs.Prefix, 1)
+			content = strings.Replace(content, "<version>", ctx.Language.GetCommandTranslation("Version"), 1)
+			content = strings.Replace(content, "<list>", ctx.Language.GetCommandTranslation("List"), 1)
+
+			response.Content = content
 		}
 
 		return &response
@@ -138,10 +145,16 @@ var verSetServer = models.Command{
 			}
 
 			response.OK = true
-			response.Content = "set server version"
+			response.Content = ctx.Language.GetString("SetGuildVersionSuccess")
 		} else {
 			response.OK = false
-			response.Content = "can't find version"
+
+			content := ctx.Language.GetString("SetGuildVersionFail")
+			content = strings.Replace(content, "<+>", ctx.GuildPrefs.Prefix, 1)
+			content = strings.Replace(content, "<version>", ctx.Language.GetCommandTranslation("Version"), 1)
+			content = strings.Replace(content, "<list>", ctx.Language.GetCommandTranslation("List"), 1)
+
+			response.Content = content
 		}
 
 		return &response

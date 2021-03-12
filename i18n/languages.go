@@ -12,7 +12,7 @@ var englishRawObjectFile []byte
 
 // ImportLanguages imports the old JSON database into the new PGSQL one.
 func ImportLanguages() map[string]models.Language {
-	var languages map[string]models.Language
+	languages := make(map[string]models.Language)
 
 	var englishRawObject models.RawLanguage
 	json.Unmarshal(englishRawObjectFile, &englishRawObject)

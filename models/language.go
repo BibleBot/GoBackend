@@ -1,6 +1,12 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"reflect"
+	"strings"
+
+	"gorm.io/gorm"
+	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/slices"
+)
 
 // Language is a type describing an interface language.
 type Language struct {
@@ -151,8 +157,8 @@ type RawLanguage struct {
 	Section    string `json:"section"`
 	Sections   string `json:"sections"`
 
-	Commands  []cmds `json:"commands"`
-	Arguments []args `json:"arguments"`
+	Commands  cmds `json:"commands"`
+	Arguments args `json:"arguments"`
 }
 
 type cmds struct {
@@ -201,4 +207,64 @@ type args struct {
 	Disable string `json:"disable"`
 	True    string `json:"true"`
 	False   string `json:"false"`
+}
+
+func (lng Language) GetString(str string) string {
+	v := reflect.ValueOf(lng.RawObject)
+
+	for i := 0; i < v.NumField(); i++ {
+		if v.Type().Field(i).Name == str && !slices.StringInSlice(str, []string{"Commands", "Arguments"}) {
+			return v.Field(i).String()
+		}
+	}
+
+	return str
+}
+
+func (lng Language) GetCommandByTranslation(str string) string {
+	v := reflect.ValueOf(lng.RawObject.Commands)
+
+	for i := 0; i < v.NumField(); i++ {
+		if v.Field(i).String() == str {
+			return strings.ToLower(v.Type().Field(i).Name)
+		}
+	}
+
+	return str
+}
+
+func (lng Language) GetCommandTranslation(str string) string {
+	v := reflect.ValueOf(lng.RawObject.Commands)
+
+	for i := 0; i < v.NumField(); i++ {
+		if v.Type().Field(i).Name == str {
+			return v.Field(i).String()
+		}
+	}
+
+	return str
+}
+
+func (lng Language) GetArgumentByTranslation(str string) string {
+	v := reflect.ValueOf(lng.RawObject.Arguments)
+
+	for i := 0; i < v.NumField(); i++ {
+		if v.Field(i).String() == str {
+			return strings.ToLower(v.Type().Field(i).Name)
+		}
+	}
+
+	return str
+}
+
+func (lng Language) GetArgumentTranslation(str string) string {
+	v := reflect.ValueOf(lng.RawObject.Arguments)
+
+	for i := 0; i < v.NumField(); i++ {
+		if v.Type().Field(i).Name == str {
+			return v.Field(i).String()
+		}
+	}
+
+	return str
 }

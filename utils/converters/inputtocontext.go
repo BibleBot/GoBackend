@@ -26,7 +26,20 @@ func InputToContext(input []byte, cfg *models.Config) (*models.Context, error) {
 	if !cfg.IsTest {
 		context.DB.Where(&models.UserPreference{UserID: context.UserID}).First(&context.Prefs)
 		context.DB.Where(&models.GuildPreference{GuildID: context.GuildID}).First(&context.GuildPrefs)
-		//context.DB.Where(&models.Language{RawName: context.Prefs.Language}).First(context.Language)
+
+		if context.Prefs.Language == "" {
+			if context.GuildPrefs.Language == "" {
+				context.Language = cfg.Languages["english"]
+			} else {
+				context.Language = cfg.Languages[context.GuildPrefs.Language]
+			}
+		} else {
+			context.Language = cfg.Languages[context.Prefs.Language]
+		}
+
+		if context.GuildPrefs.Prefix == "" {
+			context.GuildPrefs.Prefix = "+"
+		}
 	}
 
 	return &context, nil
