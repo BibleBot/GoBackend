@@ -14,7 +14,8 @@ type page struct {
 }
 
 // VerseResponse is a model for command output.
+// TODO: Make "OK" per-verse instead of overall?
 type VerseResponse struct {
-	OK      bool    `json:"ok"`
-	Results []Verse `json:"verses"`
+	OK      bool     `json:"ok"`
+	Results []*Verse `json:"verses"`
 }

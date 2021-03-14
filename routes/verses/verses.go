@@ -43,7 +43,8 @@ func fetchVerse(c *fiber.Ctx) error {
 
 	str, bookSearchResults := FindBooksInString(strings.ToLower(ctx.Body))
 
-	var verseResults []*models.Verse
+	var response models.VerseResponse
+	response.OK = true
 
 	for _, bsr := range bookSearchResults {
 		var ver models.Version
@@ -73,10 +74,10 @@ func fetchVerse(c *fiber.Ctx) error {
 			return err
 		}
 
-		verseResults = append(verseResults, verse)
+		response.Results = append(response.Results, verse)
 	}
 
-	return c.JSON(verseResults)
+	return c.JSON(response)
 }
 
 // ProcessVerse takes a reference and formatting toggles, returning a Verse object with the result.
