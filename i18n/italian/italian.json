@@ -76,7 +76,7 @@
     "votdtimeused": "The daily verse will be sent at `<time>` in the <tz> timezone and will be published in <channel>.\n\nIt will use <version>.",
     "novotdtimeused": "The automatic daily verse has not been set for this server.",
     "clearvotdtimesuccess": "The automatic daily verse successfully cleared.",
-    "votd": "Here is the daily verse:",
+    "votd": "Ecco il verestto del giorno:",
     "votdcantprocess": "The daily verse can't be processed, see <https://www.biblegateway.com/>.",
     "versioninfo": "**<versionname>**\n\nContains Old Testament: <hasOT>\nContains New Testament: <hasNT>\nContains Apocrypha/Deuterocanon: <hasDEU>",
     "versioninfofailed": "Non sono riuscito a trovare quella versione, sei sicuro di aver utilizzato l'acronimo corretto?",
