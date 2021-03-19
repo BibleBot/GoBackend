@@ -14,6 +14,7 @@ import (
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/models"
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/routes/commands/settings"
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/converters"
+	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/embedify"
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/slices"
 )
 
@@ -43,7 +44,7 @@ func commandHandler(c *fiber.Ctx) error {
 
 		return c.JSON(&models.CommandResponse{
 			OK:      false,
-			Content: err.Error(),
+			Content: embedify.Embedify("Backend", "401 Error - Unauthorized Access", err.Error(), true, ""),
 		})
 	}
 

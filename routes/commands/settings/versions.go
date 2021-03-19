@@ -3,10 +3,10 @@ package settings
 import (
 	"fmt"
 	"sort"
-	"strings"
 	"sync"
 
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/models"
+	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/embedify"
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/slices"
 )
 
@@ -78,7 +78,7 @@ var verDefault = models.Command{
 
 		return &models.CommandResponse{
 			OK:      true,
-			Content: content,
+			Content: embedify.Embedify("", "+version", content, false, ""),
 		}
 	},
 }
@@ -106,16 +106,10 @@ var verSet = models.Command{
 			}
 
 			response.OK = true
-			response.Content = ctx.Language.GetString("SetVersionSuccess")
+			response.Content = embedify.Embedify("", "+version set", ctx.Language.GetString(ctx, "SetVersionSuccess", nil), false, "")
 		} else {
 			response.OK = false
-
-			content := ctx.Language.GetString("SetVersionFail")
-			content = strings.Replace(content, "<+>", ctx.GuildPrefs.Prefix, 1)
-			content = strings.Replace(content, "<version>", ctx.Language.GetCommandTranslation("Version"), 1)
-			content = strings.Replace(content, "<list>", ctx.Language.GetCommandTranslation("List"), 1)
-
-			response.Content = content
+			response.Content = embedify.Embedify("", "+version set", ctx.Language.GetString(ctx, "SetVersionFail", []string{"<+>", "<version>", "<list>"}), false, "")
 		}
 
 		return &response
@@ -145,16 +139,10 @@ var verSetServer = models.Command{
 			}
 
 			response.OK = true
-			response.Content = ctx.Language.GetString("SetGuildVersionSuccess")
+			response.Content = embedify.Embedify("", "+version setserver", ctx.Language.GetString(ctx, "SetGuildVersionSuccess", nil), false, "")
 		} else {
 			response.OK = false
-
-			content := ctx.Language.GetString("SetGuildVersionFail")
-			content = strings.Replace(content, "<+>", ctx.GuildPrefs.Prefix, 1)
-			content = strings.Replace(content, "<version>", ctx.Language.GetCommandTranslation("Version"), 1)
-			content = strings.Replace(content, "<list>", ctx.Language.GetCommandTranslation("List"), 1)
-
-			response.Content = content
+			response.Content = embedify.Embedify("", "+version setserver", ctx.Language.GetString(ctx, "SetGuildVersionFail", []string{"<+>", "<version>", "<list>"}), false, "")
 		}
 
 		return &response

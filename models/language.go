@@ -209,7 +209,39 @@ type args struct {
 	False   string `json:"false"`
 }
 
-func (lng Language) GetString(str string) string {
+func (lng Language) GetString(ctx *Context, str string, params []string) string {
+	// TODO: Infer params from raw string, as they are always surrounded by <>. Making it a parameter is mildly inconvenient.
+	rawStr := lng.GetRawString(str)
+
+	if params == nil {
+		return rawStr
+	}
+
+	for _, replaceQuery := range params {
+		origQuery := replaceQuery
+
+		switch replaceQuery {
+		case "<+>":
+			replaceQuery = ctx.GuildPrefs.Prefix
+		default:
+			purifiedQuery := strings.Title(replaceQuery[1 : len(replaceQuery)-1])
+			possibleCommand := lng.GetCommandTranslation(purifiedQuery)
+			possibleArgument := lng.GetArgumentTranslation(purifiedQuery)
+
+			if possibleCommand != purifiedQuery {
+				replaceQuery = possibleCommand
+			} else if possibleArgument != purifiedQuery {
+				replaceQuery = possibleArgument
+			}
+		}
+
+		rawStr = strings.ReplaceAll(rawStr, origQuery, replaceQuery)
+	}
+
+	return rawStr
+}
+
+func (lng Language) GetRawString(str string) string {
 	v := reflect.ValueOf(lng.RawObject)
 
 	for i := 0; i < v.NumField(); i++ {

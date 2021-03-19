@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/models"
-	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/logger"
 )
 
 const (
@@ -12,7 +11,7 @@ const (
 	ERROR_COLOR  = 16723502
 )
 
-func Embedify(author string, title string, description string, isError bool, copyright string) (*models.DiscordEmbed, error) {
+func Embedify(author string, title string, description string, isError bool, copyright string) *models.DiscordEmbed {
 	var embed models.DiscordEmbed
 
 	embed.Colour = NORMAL_COLOR
@@ -29,13 +28,14 @@ func Embedify(author string, title string, description string, isError bool, cop
 
 	if author != "" {
 		embed.Author.Name = author
+		embed.Author.IconURL = embed.Footer.IconURL
 	}
 
 	if description != "" {
 		if len(description) < 2049 {
 			embed.Description = description
 		} else {
-			return nil, logger.LogWithError("embedify", "description is too long", nil)
+			return nil
 		}
 	}
 
@@ -43,5 +43,5 @@ func Embedify(author string, title string, description string, isError bool, cop
 		embed.Footer.Text = fmt.Sprintf("%s // %s", copyright, embed.Footer.Text)
 	}
 
-	return &embed, nil
+	return &embed
 }
