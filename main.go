@@ -28,6 +28,7 @@ import (
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	gLog "gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
 
 	"golang.org/x/crypto/acme/autocert"
@@ -101,6 +102,9 @@ func SetupApp(isTest bool) (*fiber.App, *models.Config) {
 	if !isTest {
 		// Fetch book names.
 		namefetcher.FetchBookNames(config.APIBibleKey, config.IsDryRun, false)
+
+		// Make sure that gorm's logger is disabled during testing.
+		gormConfig.Logger = gLog.Default.LogMode(gLog.Silent)
 	}
 
 	// Connect to database and include it in the config.
