@@ -2,15 +2,12 @@ package models
 
 import (
 	"reflect"
+	"regexp"
 	"strings"
-
-	"gorm.io/gorm"
-	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/slices"
 )
 
 // Language is a type describing an interface language.
 type Language struct {
-	gorm.Model
 	Name      string
 	RawName   string
 	RawObject RawLanguage
@@ -209,45 +206,45 @@ type args struct {
 	False   string `json:"false"`
 }
 
-func (lng Language) GetString(ctx *Context, str string, params []string) string {
-	// TODO: Infer params from raw string, as they are always surrounded by <>. Making it a parameter is mildly inconvenient.
-	rawStr := lng.GetRawString(str)
-
-	if params == nil {
-		return rawStr
-	}
-
-	for _, replaceQuery := range params {
-		origQuery := replaceQuery
-
-		switch replaceQuery {
-		case "<+>":
-			replaceQuery = ctx.GuildPrefs.Prefix
-		default:
-			purifiedQuery := strings.Title(replaceQuery[1 : len(replaceQuery)-1])
-			possibleCommand := lng.GetCommandTranslation(purifiedQuery)
-			possibleArgument := lng.GetArgumentTranslation(purifiedQuery)
-
-			if possibleCommand != purifiedQuery {
-				replaceQuery = possibleCommand
-			} else if possibleArgument != purifiedQuery {
-				replaceQuery = possibleArgument
-			}
-		}
-
-		rawStr = strings.ReplaceAll(rawStr, origQuery, replaceQuery)
-	}
-
-	return rawStr
+func (lng Language) GetString(ctx *Context, str string) string {
+	return lng.TranslatePlaceholdersInString(ctx, lng.GetRawString(str))
 }
 
 func (lng Language) GetRawString(str string) string {
 	v := reflect.ValueOf(lng.RawObject)
 
 	for i := 0; i < v.NumField(); i++ {
-		if v.Type().Field(i).Name == str && !slices.StringInSlice(str, []string{"Commands", "Arguments"}) {
+		if v.Type().Field(i).Name == str && !stringInSlice(str, []string{"Commands", "Arguments"}) {
 			return v.Field(i).String()
 		}
+	}
+
+	return str
+}
+
+func (lng Language) TranslatePlaceholdersInString(ctx *Context, str string) string {
+	placeholderRegex, _ := regexp.Compile("<([^<>]+)>")
+	placeholders := placeholderRegex.FindAllString(str, -1)
+
+	for _, placeholder := range placeholders {
+		tmpPlaceholder := placeholder
+
+		switch placeholder {
+		case "<+>":
+			placeholder = ctx.GuildPrefs.Prefix
+		default:
+			purifiedQuery := strings.Title(placeholder[1 : len(placeholder)-1])
+			possibleCommand := lng.GetCommandTranslation(purifiedQuery)
+			possibleArgument := lng.GetArgumentTranslation(purifiedQuery)
+
+			if possibleCommand != purifiedQuery {
+				placeholder = possibleCommand
+			} else if possibleArgument != purifiedQuery {
+				placeholder = possibleArgument
+			}
+		}
+
+		str = strings.ReplaceAll(str, tmpPlaceholder, placeholder)
 	}
 
 	return str
@@ -299,4 +296,13 @@ func (lng Language) GetArgumentTranslation(str string) string {
 	}
 
 	return str
+}
+
+func stringInSlice(a string, list []string) bool {
+	for _, b := range list {
+		if b == a {
+			return true
+		}
+	}
+	return false
 }

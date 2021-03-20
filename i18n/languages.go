@@ -10,7 +10,7 @@ import (
 //go:embed english/english.json
 var englishRawObjectFile []byte
 
-// ImportLanguages imports the old JSON database into the new PGSQL one.
+// ImportLanguages simply imports any defined languages and returns them in a map.
 func ImportLanguages() map[string]models.Language {
 	languages := make(map[string]models.Language)
 

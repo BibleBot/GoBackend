@@ -2,9 +2,10 @@ package models
 
 // CommandResponse is a model for command output.
 type CommandResponse struct {
-	OK      bool            `json:"ok"`
-	Content *DiscordEmbed   `json:"content"`
-	Pages   []*DiscordEmbed `json:"pages"`
+	OK       bool            `json:"ok"`
+	Language *Language       `json:"language"`
+	Content  *DiscordEmbed   `json:"content"`
+	Pages    []*DiscordEmbed `json:"pages"`
 }
 
 // VerseResponse is a model for command output.

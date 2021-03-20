@@ -2,7 +2,10 @@ package settings
 
 import (
 	"fmt"
+	"math"
 	"sort"
+	"strconv"
+	"strings"
 	"sync"
 
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/models"
@@ -27,7 +30,7 @@ func NewVersionCommandRouter() *VersionCommandRouter {
 	versionOnce.Do(func() {
 		versionInstance = &VersionCommandRouter{
 			DefaultCommand: verDefault,
-			Commands:       []models.Command{verSet, verSetServer},
+			Commands:       []models.Command{verSet, verSetServer, verList},
 		}
 	})
 
@@ -86,6 +89,8 @@ var verDefault = models.Command{
 var verSet = models.Command{
 	Command: "set",
 	Process: func(params []string, ctx *models.Context) *models.CommandResponse {
+		lng := ctx.Language
+
 		var idealVersion models.Version
 		var idealUser models.UserPreference
 
@@ -106,10 +111,10 @@ var verSet = models.Command{
 			}
 
 			response.OK = true
-			response.Content = embedify.Embedify("", "+version set", ctx.Language.GetString(ctx, "SetVersionSuccess", nil), false, "")
+			response.Content = embedify.Embedify("", lng.TranslatePlaceholdersInString(ctx, "<+><version> <set>"), lng.GetString(ctx, "SetVersionSuccess"), false, "")
 		} else {
 			response.OK = false
-			response.Content = embedify.Embedify("", "+version set", ctx.Language.GetString(ctx, "SetVersionFail", []string{"<+>", "<version>", "<list>"}), false, "")
+			response.Content = embedify.Embedify("", lng.TranslatePlaceholdersInString(ctx, "<+><version> <set>"), lng.GetString(ctx, "SetVersionFail"), false, "")
 		}
 
 		return &response
@@ -119,6 +124,8 @@ var verSet = models.Command{
 var verSetServer = models.Command{
 	Command: "setserver",
 	Process: func(params []string, ctx *models.Context) *models.CommandResponse {
+		lng := ctx.Language
+
 		var idealVersion models.Version
 		var idealGuild models.GuildPreference
 
@@ -139,10 +146,10 @@ var verSetServer = models.Command{
 			}
 
 			response.OK = true
-			response.Content = embedify.Embedify("", "+version setserver", ctx.Language.GetString(ctx, "SetGuildVersionSuccess", nil), false, "")
+			response.Content = embedify.Embedify("", lng.TranslatePlaceholdersInString(ctx, "<+><version> <setserver>"), lng.GetString(ctx, "SetGuildVersionSuccess"), false, "")
 		} else {
 			response.OK = false
-			response.Content = embedify.Embedify("", "+version setserver", ctx.Language.GetString(ctx, "SetGuildVersionFail", []string{"<+>", "<version>", "<list>"}), false, "")
+			response.Content = embedify.Embedify("", lng.TranslatePlaceholdersInString(ctx, "<+><version> <setserver>"), lng.GetString(ctx, "SetGuildVersionFail"), false, "")
 		}
 
 		return &response
@@ -160,19 +167,46 @@ var verList = models.Command{
 			return versions[i].Name < versions[j].Name
 		})
 
-		/*var pages []string
+		var pages []*models.DiscordEmbed
 		var maxResultsPerPage = 25
 		var versionsUsed []models.Version
-		totalPages := math.Ceil(len(versions) / maxResultsPerPage)
+		totalPages := int(math.Ceil(float64(len(versions)) / float64(maxResultsPerPage)))
 
 		if totalPages == 0 {
 			totalPages = 1
 		}
 
-		for i := range totalPages {
-			// TODO, finish this once languages are implemented
-		}*/
+		for i := 0; i < totalPages; i++ {
+			pageCounter := ctx.Language.GetString(ctx, "PageOf")
+			pageCounter = strings.ReplaceAll(pageCounter, "<num>", strconv.Itoa(i+1))
+			pageCounter = strings.ReplaceAll(pageCounter, "<total>", strconv.Itoa(totalPages))
 
-		return &models.CommandResponse{}
+			title := fmt.Sprintf("%s - %s", ctx.Language.TranslatePlaceholdersInString(ctx, "<+><version> <list>"), pageCounter)
+			embed := embedify.Embedify("", title, "", false, "")
+
+			count := 0
+			versionList := ""
+
+			for _, version := range versions {
+				if count < maxResultsPerPage {
+					if !slices.VersionInSlice(version, versionsUsed) {
+						versionList += fmt.Sprintf("%s\n", version.Name)
+
+						versionsUsed = append(versionsUsed, version)
+						versions = versions[1:]
+						count++
+					}
+				}
+			}
+
+			embed.Description = versionList
+			pages = append(pages, embed)
+		}
+
+		return &models.CommandResponse{
+			OK:       true,
+			Language: &ctx.Language,
+			Pages:    pages,
+		}
 	},
 }

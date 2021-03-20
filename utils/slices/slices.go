@@ -2,6 +2,8 @@ package slices
 
 import (
 	"reflect"
+
+	"internal.kerygma.digital/kerygma-digital/biblebot/backend/models"
 )
 
 // Index finds index of string in []string, otherwise returns -1
@@ -45,6 +47,16 @@ func StringInSlice(a string, list []string) bool {
 
 // IntInSlice returns whether a is in list.
 func IntInSlice(a int, list []int) bool {
+	for _, b := range list {
+		if b == a {
+			return true
+		}
+	}
+	return false
+}
+
+// VersionInSlice returns whether a is in list.
+func VersionInSlice(a models.Version, list []models.Version) bool {
 	for _, b := range list {
 		if b == a {
 			return true
