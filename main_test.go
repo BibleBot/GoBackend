@@ -37,7 +37,7 @@ func TestCommands_U(t *testing.T) {
 
 func TestBibleGatewayVerses(t *testing.T) {
 	inputToOutput := map[string]models.VerseResponse{
-		"and so we have Psalm 3:1-": {
+		"and so we have Psalm 3:1- RSV": {
 			OK: true,
 			Results: []*models.Verse{
 				{
@@ -72,7 +72,6 @@ func TestBibleGatewayVerses(t *testing.T) {
 	for input, output := range inputToOutput {
 		input := map[string]string{
 			"body":  input,
-			"ver":   "RSV",
 			"token": "meowmix",
 		}
 
