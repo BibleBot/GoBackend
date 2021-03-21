@@ -49,6 +49,7 @@ var (
 		NamingStrategy: schema.NamingStrategy{
 			TablePrefix: "bb_",
 		},
+		Logger: gLog.Default.LogMode(gLog.Silent),
 	}
 )
 
@@ -103,8 +104,8 @@ func SetupApp(isTest bool) (*fiber.App, *models.Config) {
 		// Fetch book names.
 		namefetcher.FetchBookNames(config.APIBibleKey, config.IsDryRun, false)
 
-		// Make sure that gorm's logger is disabled during testing.
-		gormConfig.Logger = gLog.Default.LogMode(gLog.Silent)
+		// Enable GORM logging normally.
+		gormConfig.Logger = gLog.Default.LogMode(gLog.Error)
 	}
 
 	// Connect to database and include it in the config.
