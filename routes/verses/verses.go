@@ -59,7 +59,7 @@ func fetchVerse(c *fiber.Ctx) error {
 
 		config.DB.Where(&models.Version{Abbreviation: ctx.Prefs.Version}).First(&ver)
 
-		ref := GenerateReference(str, bsr, ver)
+		ref := GenerateReference(config.DB, str, bsr, ver)
 		if ref == nil {
 			continue
 		}
@@ -87,10 +87,8 @@ func ProcessVerse(ref *models.Reference, titles bool, verseNumbers bool) (*model
 	switch ref.Version.Source {
 	case "bg":
 		provider = bgProvider
-		break
 	case "ab":
 		provider = abProvider
-		break
 	default:
 		return nil, logger.LogWithError("processVerse", "invalid provider found in reference", nil)
 	}

@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 
+	"gorm.io/gorm"
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/models"
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/bookmap"
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/namefetcher"
@@ -48,13 +49,13 @@ func FindBooksInString(str string) (string, []models.BookSearchResult) {
 }
 
 // GenerateReference creates a reference object based on a BookSearchResult and the surrounding values in a string.
-func GenerateReference(str string, bookSearchResult models.BookSearchResult, version models.Version) *models.Reference {
+func GenerateReference(db gorm.DB, str string, bookSearchResult models.BookSearchResult, version models.Version) *models.Reference {
 	book := bookSearchResult.Name
 	startingChapter := 0
 	startingVerse := 0
 	endingChapter := 0
 	endingVerse := 0
-	//tokenIdxAfterSpan := 0
+	tokenIdxAfterSpan := 0
 
 	tokens := strings.Split(str, " ")
 
@@ -62,7 +63,7 @@ func GenerateReference(str string, bookSearchResult models.BookSearchResult, ver
 		relevantToken := tokens[bookSearchResult.Index+1:][0]
 
 		if strings.Contains(relevantToken, ":") {
-			//tokenIdxAfterSpan = bookSearchResult.Index + 2
+			tokenIdxAfterSpan = bookSearchResult.Index + 2
 
 			colonRegex, _ := regexp.Compile(":")
 			colonQuantity := len(colonRegex.FindAllStringIndex(relevantToken, -1))
@@ -93,8 +94,6 @@ func GenerateReference(str string, bookSearchResult models.BookSearchResult, ver
 						endingVerse = secondNum
 					}
 				}
-
-				break
 			case 1:
 				pair := strings.Split(relevantToken, ":")
 
@@ -115,6 +114,8 @@ func GenerateReference(str string, bookSearchResult models.BookSearchResult, ver
 
 					num, err := strconv.Atoi(pairValue)
 					if err != nil {
+						// We know that BibleGateway will extend to the end of a chapter with this syntax,
+						// but for other sources this is likely not available.
 						if version.Source == "bg" {
 							// Instead of returning nil, we'll break out of the loop
 							// in the event that the span exists to extend to the end of a chapter.
@@ -125,10 +126,8 @@ func GenerateReference(str string, bookSearchResult models.BookSearchResult, ver
 					switch idx {
 					case 0:
 						startingVerse = num
-						break
 					case 1:
 						endingVerse = num
-						break
 					default:
 						return nil
 					}
@@ -137,15 +136,19 @@ func GenerateReference(str string, bookSearchResult models.BookSearchResult, ver
 				if endingVerse == 0 && spanQuantity == 0 {
 					endingVerse = startingVerse
 				}
-
-				break
 			}
 
-			// TODO: This after DBs implemented.
-			/*if len(tokens) > tokenIdxAfterSpan {
-				lastToken = strings.ToUpper(tokens[tokenIdxAfterSpan])
-				// if version exists corresponding to lastToken, use that instead
-			}*/
+			// If the last token of the reference is a version abbreviation, utilize that version.
+			if len(tokens) > tokenIdxAfterSpan {
+				lastToken := strings.ToUpper(tokens[tokenIdxAfterSpan])
+
+				var idealVersion models.Version
+				db.Where(&models.Version{Abbreviation: lastToken}).First(&idealVersion)
+
+				if idealVersion.Abbreviation == lastToken {
+					version = idealVersion
+				}
+			}
 		}
 	} else {
 		return nil
@@ -192,8 +195,8 @@ func isValueInString(value string, str string) bool {
 }
 
 func removePunctuation(str string) string {
-	noPunctuationRegex, _ := regexp.Compile("[^\\w\\s]|_")
-	minimizeWhitespaceRegex, _ := regexp.Compile("\\s+")
+	noPunctuationRegex, _ := regexp.Compile(`[^\w\s]|_`)
+	minimizeWhitespaceRegex, _ := regexp.Compile(`\s+`)
 
 	return minimizeWhitespaceRegex.ReplaceAllString(noPunctuationRegex.ReplaceAllString(str, ""), " ")
 }
