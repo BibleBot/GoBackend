@@ -18,6 +18,7 @@ var (
 	config     *models.Config
 	abProvider *providers.APIBibleProvider
 	bgProvider *providers.BibleGatewayProvider
+	boProvider *providers.BollsProvider
 )
 
 // RegisterRouter registers routers related to verse processing.
@@ -25,6 +26,7 @@ func RegisterRouter(app *fiber.App, cfg *models.Config) {
 	config = cfg
 	abProvider = providers.NewAPIBibleProvider(cfg.APIBibleKey)
 	bgProvider = providers.NewBibleGatewayProvider()
+	boProvider = providers.NewBollsProvider()
 
 	app.Get("/api/verses/fetch", fetchVerse)
 }

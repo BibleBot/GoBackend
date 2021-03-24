@@ -16,4 +16,5 @@ type Context struct {
 	UserID    string `json:"userID"`
 	ChannelID string `json:"channelID"`
 	GuildID   string `json:"guildID"`
+	Version   string `json:"version"`
 }

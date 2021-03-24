@@ -12,6 +12,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/models"
+	"internal.kerygma.digital/kerygma-digital/biblebot/backend/routes/commands/information"
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/routes/commands/settings"
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/converters"
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/embedify"
@@ -27,6 +28,7 @@ var (
 	config *models.Config
 
 	vcr = settings.NewVersionCommandRouter()
+	icr = information.NewInformationCommandRouter()
 )
 
 // RegisterRouter registers routers related to command processing.
@@ -48,7 +50,7 @@ func commandHandler(c *fiber.Ctx) error {
 		})
 	}
 
-	res := vcr.Process(strings.Split(ctx.Body, " ")[1:], ctx)
+	res := icr.Process(strings.Split(ctx.Body, " "), ctx)
 
 	return c.JSON(res)
 }

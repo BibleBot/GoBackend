@@ -30,12 +30,10 @@ func ImportVersions(db *gorm.DB) {
 	for _, val := range oldVersionEntries {
 		source := "bg"
 
-		if slices.StringInSlice(val.Abbreviation, []string{"BSB", "NHEB", "WBT"}) {
+		if slices.StringInSlice(val.Abbreviation, []string{"BSB", "NHEB", "WBT", "ELXX", "LXX"}) {
 			continue
 		} else if slices.StringInSlice(val.Abbreviation, []string{"KJVA", "FBV"}) {
 			source = "ab"
-		} else if slices.StringInSlice(val.Abbreviation, []string{"ELXX", "LXX"}) {
-			continue
 		}
 
 		newVersion := &models.Version{

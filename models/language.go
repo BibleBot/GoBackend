@@ -232,6 +232,10 @@ func (lng Language) TranslatePlaceholdersInString(ctx *Context, str string) stri
 		switch placeholder {
 		case "<+>":
 			placeholder = ctx.GuildPrefs.Prefix
+		case "<truerandom>":
+			placeholder = lng.GetCommandTranslation("TrueRandom")
+		case "<dailyverse>":
+			placeholder = lng.GetCommandTranslation("DailyVerse")
 		default:
 			purifiedQuery := strings.Title(placeholder[1 : len(placeholder)-1])
 			possibleCommand := lng.GetCommandTranslation(purifiedQuery)

@@ -2,16 +2,16 @@ package models
 
 // DiscordEmbed is a struct representing a typical Discord RichEmbed. This is so we can output a JSONified embed that the frontend can interpret into the actual object.
 type DiscordEmbed struct {
-	Title       string  `json:"title"`
-	Description string  `json:"description"`
-	URL         string  `json:"url"`
-	Colour      int     `json:"colour"`
-	Footer      footer  `json:"footer"`
-	Image       media   `json:"image"`
-	Thumbnail   media   `json:"thumbnail"`
-	Video       media   `json:"video"`
-	Author      author  `json:"author"`
-	Fields      []field `json:"fields"`
+	Title       string       `json:"title"`
+	Description string       `json:"description"`
+	URL         string       `json:"url"`
+	Colour      int          `json:"colour"`
+	Footer      footer       `json:"footer"`
+	Image       media        `json:"image"`
+	Thumbnail   media        `json:"thumbnail"`
+	Video       media        `json:"video"`
+	Author      author       `json:"author"`
+	Fields      []EmbedField `json:"fields"`
 }
 
 type footer struct {
@@ -29,7 +29,8 @@ type author struct {
 	IconURL string `json:"icon_url"`
 }
 
-type field struct {
+// EmbedField is a struct representing Discord embed fields.
+type EmbedField struct {
 	Name   string `json:"name"`
 	Value  string `json:"value"`
 	Inline bool   `json:"inline"`

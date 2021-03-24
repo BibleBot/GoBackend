@@ -21,6 +21,7 @@ func InputToContext(input []byte, cfg *models.Config) (*models.Context, error) {
 		return nil, logger.LogWithError("inputtocontext", "invalid API key", nil)
 	}
 
+	context.Version = "v9.1.0"
 	context.DB = cfg.DB
 
 	if !cfg.IsTest {

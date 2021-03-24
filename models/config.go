@@ -16,6 +16,7 @@ type Config struct {
 	DecryptionKey    string   `yaml:"decryptionKey"`
 	EncryptedFiles   []string `yaml:"encryptedFiles"`
 	IsTest           bool     `yaml:"isTest"`
+	Version          string   `yaml:"version"`
 	DB               gorm.DB
 	Languages        map[string]Language
 }
