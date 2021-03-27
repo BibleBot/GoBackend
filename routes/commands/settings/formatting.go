@@ -1,9 +1,13 @@
 package settings
 
 import (
+	"fmt"
+	"strconv"
+	"strings"
 	"sync"
 
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/models"
+	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/embedify"
 	"internal.kerygma.digital/kerygma-digital/biblebot/backend/utils/slices"
 )
 
@@ -57,20 +61,45 @@ func (cr *FormatCommandRouter) Process(params []string, ctx *models.Context) *mo
 	return cm.Process(params[1:], ctx)
 }
 
-// Get user preferences (headings, verse numbers, display style) and a list of formatting commands
+// Get user preferences (display style, headings, verse numbers), guild preferences (prefix, brackets), and a list of formatting commands
 var fmtDefault = models.Command{
 	Command: "formatting",
 	Process: func(_ []string, ctx *models.Context) *models.CommandResponse {
-		return nil
+		fmt.Println(ctx.Prefs)
+		lng := ctx.Language
+
+		guildPrefix := ctx.GuildPrefs.Prefix
+		userDisplayStyle := ctx.Prefs.DisplayMode
+		userHeadings := ctx.Prefs.Titles
+		userVerseNumbers := ctx.Prefs.VerseNumbers
+		guildBrackets := ctx.GuildPrefs.IgnoringBrackets
+
+		// Check if not nil?
+
+		var response models.CommandResponse
+
+		// Make this pretty eventually
+		content := fmt.Sprintf("Current Preferences:\n%s\n%s\n%s\n%s\n%s\n\nFormatting Commands:\n",
+			strings.Replace(lng.GetString(ctx, "GuildPrefixUsed"), "<prefix>", guildPrefix, 1),
+			strings.Replace(lng.GetString(ctx, "Formatting"), "<value>", userDisplayStyle, 1),
+			strings.Replace(lng.GetString(ctx, "Headings"), "<status>", strconv.FormatBool(userHeadings), 1),
+			strings.Replace(lng.GetString(ctx, "VerseNumbers"), "<status>", strconv.FormatBool(userVerseNumbers), 1),
+			strings.Replace(lng.GetString(ctx, "GuildBracketsUsed"), "<brackets>", guildBrackets, 1),
+		)
+
+		response.OK = true
+		response.Content = embedify.Embedify("", lng.TranslatePlaceholdersInString(ctx, "<+><formatting>"), content, false, "")
+
+		return &response
 	},
 }
 
-// Get guild preferences (prefix, brackets)
+// Set guild prefix
 
 // Set guild brackets (<>, [], {}, ()) <- allow more than one?
+
+// Set user display style (default, embed, blockquote, code)
 
 // Set user headings (true, false)
 
 // Set user verse numbers (true, false)
-
-// Set user display style (default, embed, blockquote, code)
