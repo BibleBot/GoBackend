@@ -28,7 +28,7 @@ func NewFormattingCommandRouter() *FormatCommandRouter {
 	formattingOnce.Do(func() {
 		formattingInstance = &FormatCommandRouter{
 			DefaultCommand: fmtDefault,
-			Commands:       []models.Command{},
+			Commands:       []models.Command{fmtPrefix, fmtBrackets, fmtStyle, fmtHeadings, fmtVerseNumbers},
 		}
 	})
 
@@ -61,6 +61,7 @@ func (cr *FormatCommandRouter) Process(params []string, ctx *models.Context) *mo
 	return cm.Process(params[1:], ctx)
 }
 
+// TODO: Improve
 // Get user preferences (display style, headings, verse numbers), guild preferences (prefix, brackets), and a list of formatting commands
 var fmtDefault = models.Command{
 	Command: "formatting",
@@ -78,7 +79,7 @@ var fmtDefault = models.Command{
 
 		var response models.CommandResponse
 
-		// Make this pretty eventually
+		// Make this pretty eventually (simplify from full sentences in i18n to simple Key: Value?)
 		content := fmt.Sprintf("Current Preferences:\n%s\n%s\n%s\n%s\n%s\n\nFormatting Commands:\n",
 			strings.Replace(lng.GetString(ctx, "GuildPrefixUsed"), "<prefix>", guildPrefix, 1),
 			strings.Replace(lng.GetString(ctx, "Formatting"), "<value>", userDisplayStyle, 1),
@@ -94,12 +95,62 @@ var fmtDefault = models.Command{
 	},
 }
 
+// TODO: Implement
 // Set guild prefix
+var fmtPrefix = models.Command{
+	Command: "prefix",
+	Process: func(params []string, ctx *models.Context) *models.CommandResponse {
+		fmt.Println(ctx.Prefs)
+		// lng := ctx.Language
 
+		return nil
+	},
+}
+
+// TODO: Implement
 // Set guild brackets (<>, [], {}, ()) <- allow more than one?
+var fmtBrackets = models.Command{
+	Command: "brackets",
+	Process: func(params []string, ctx *models.Context) *models.CommandResponse {
+		fmt.Println(ctx.Prefs)
+		// lng := ctx.Language
 
+		return nil
+	},
+}
+
+// TODO: Implement
 // Set user display style (default, embed, blockquote, code)
+var fmtStyle = models.Command{
+	Command: "style",
+	Process: func(params []string, ctx *models.Context) *models.CommandResponse {
+		fmt.Println(ctx.Prefs)
+		// lng := ctx.Language
 
+		return nil
+	},
+}
+
+// TODO: Implement
 // Set user headings (true, false)
+var fmtHeadings = models.Command{
+	Command: "headings",
+	Process: func(params []string, ctx *models.Context) *models.CommandResponse {
+		fmt.Println(ctx.Prefs)
+		// lng := ctx.Language
 
+		return nil
+	},
+}
+
+// TODO: Implement
 // Set user verse numbers (true, false)
+var fmtVerseNumbers = models.Command{
+	Command: "numbers",
+	Process: func(params []string, ctx *models.Context) *models.CommandResponse {
+		fmt.Println(ctx.Prefs)
+		// lng := ctx.Language
+
+		return nil
+	},
+}
