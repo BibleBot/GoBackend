@@ -103,6 +103,9 @@ var fmtPrefix = models.Command{
 		fmt.Println(ctx.Prefs)
 		// lng := ctx.Language
 
+		// if owner/has manage server permissions
+		// Update server preference, send confirmation
+
 		return nil
 	},
 }
