@@ -61,7 +61,7 @@ func (cr *FormatCommandRouter) Process(params []string, ctx *models.Context) *mo
 	return cm.Process(params[1:], ctx)
 }
 
-// TODO: Improve
+// TODO: Improve/Check
 // Get user preferences (display style, headings, verse numbers), guild preferences (prefix, brackets), and a list of formatting commands
 var fmtDefault = models.Command{
 	Command: "formatting",
@@ -95,18 +95,41 @@ var fmtDefault = models.Command{
 	},
 }
 
-// TODO: Implement
+// TODO: Improve/Check
 // Set guild prefix
 var fmtPrefix = models.Command{
 	Command: "prefix",
 	Process: func(params []string, ctx *models.Context) *models.CommandResponse {
+		// if not owner/manage permissions return error
+
 		fmt.Println(ctx.Prefs)
-		// lng := ctx.Language
+		lng := ctx.Language
 
-		// if owner/has manage server permissions
-		// Update server preference, send confirmation
+		var idealGuild models.GuildPreference
 
-		return nil
+		guildResult := ctx.DB.Where(&models.GuildPreference{GuildID: ctx.GuildID}).First(&idealGuild)
+
+		var response models.CommandResponse
+
+		if len(params[0]) == 1 {
+			if guildResult.Error == nil {
+				idealGuild.Prefix = params[0]
+				ctx.DB.Save(idealGuild)
+			} else {
+				ctx.DB.Create(&models.GuildPreference{
+					GuildID: ctx.GuildID,
+					Prefix:  params[0],
+				})
+			}
+
+			response.OK = true
+			response.Content = embedify.Embedify("", lng.TranslatePlaceholdersInString(ctx, "<+><formatting> <setprefix>"), lng.GetString(ctx, "PrefixSuccess"), false, "")
+		} else {
+			response.OK = false
+			response.Content = embedify.Embedify("", lng.TranslatePlaceholdersInString(ctx, "<+><formatting> <setprefix>"), lng.GetString(ctx, "PrefixOneChar"), false, "")
+		}
+
+		return &response
 	},
 }
 
