@@ -41,6 +41,8 @@ func InputToContext(input []byte, cfg *models.Config) (*models.Context, error) {
 		if context.GuildPrefs.Prefix == "" {
 			context.GuildPrefs.Prefix = "+"
 		}
+
+		context.Language.Prefix = context.GuildPrefs.Prefix
 	}
 
 	return &context, nil

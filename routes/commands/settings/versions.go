@@ -65,7 +65,8 @@ func (cr *VersionCommandRouter) Process(params []string, ctx *models.Context) *m
 var verDefault = models.Command{
 	Command: "version",
 	Process: func(_ []string, ctx *models.Context) *models.CommandResponse {
-		fmt.Println(ctx.Prefs)
+		lng := ctx.Language
+
 		var userVersion models.Version
 		var guildVersion models.Version
 
@@ -77,7 +78,18 @@ var verDefault = models.Command{
 			ctx.DB.Where(&models.Version{Abbreviation: ctx.GuildPrefs.Version}).First(&guildVersion)
 		}
 
-		content := fmt.Sprintf("You are using **%s**.\nThis server is using **%s**.", userVersion.Name, guildVersion.Name)
+		tVersionUsed := strings.ReplaceAll(lng.GetRawString("VersionUsed"), "<version>", "**"+userVersion.Name+"**")
+		tGuildVersionUsed := strings.ReplaceAll(lng.GetRawString("ServerVersionUsed"), "<version>", "**"+guildVersion.Name+"**")
+
+		tUsage := "**%s** - %s"
+		tSetVersionUsage := fmt.Sprintf(tUsage, lng.GetString("set"), lng.GetString("SetVersionUsage"))
+		tSetGuildVersionUsage := fmt.Sprintf(tUsage, lng.GetString("setserver"), lng.GetString("SetServerVersionUsage"))
+		tInfoUsage := fmt.Sprintf(tUsage, lng.GetString("info"), lng.GetString("InfoUsage"))
+		tListUsage := fmt.Sprintf(tUsage, lng.GetString("list"), lng.GetString("ListVersionUsage"))
+
+		content := fmt.Sprintf("%s\n%s\n\n__%s__\n%s\n%s\n%s\n%s",
+			tVersionUsed, tGuildVersionUsed, lng.GetString("Subcommands"),
+			tSetVersionUsage, tSetGuildVersionUsage, tInfoUsage, tListUsage)
 
 		return &models.CommandResponse{
 			OK:      true,
@@ -111,10 +123,10 @@ var verSet = models.Command{
 			}
 
 			response.OK = true
-			response.Content = embedify.Embedify("", lng.TranslatePlaceholdersInString(ctx, "<+><version> <set>"), lng.GetString(ctx, "SetVersionSuccess"), false, "")
+			response.Content = embedify.Embedify("", lng.TranslatePlaceholdersInString("<+><version> <set>"), lng.GetString("SetVersionSuccess"), false, "")
 		} else {
 			response.OK = false
-			response.Content = embedify.Embedify("", lng.TranslatePlaceholdersInString(ctx, "<+><version> <set>"), lng.GetString(ctx, "SetVersionFail"), false, "")
+			response.Content = embedify.Embedify("", lng.TranslatePlaceholdersInString("<+><version> <set>"), lng.GetString("SetVersionFail"), false, "")
 		}
 
 		return &response
@@ -146,10 +158,10 @@ var verSetServer = models.Command{
 			}
 
 			response.OK = true
-			response.Content = embedify.Embedify("", lng.TranslatePlaceholdersInString(ctx, "<+><version> <setserver>"), lng.GetString(ctx, "SetGuildVersionSuccess"), false, "")
+			response.Content = embedify.Embedify("", lng.TranslatePlaceholdersInString("<+><version> <setserver>"), lng.GetString("SetServerVersionSuccess"), false, "")
 		} else {
 			response.OK = false
-			response.Content = embedify.Embedify("", lng.TranslatePlaceholdersInString(ctx, "<+><version> <setserver>"), lng.GetString(ctx, "SetGuildVersionFail"), false, "")
+			response.Content = embedify.Embedify("", lng.TranslatePlaceholdersInString("<+><version> <setserver>"), lng.GetString("SetServerVersionFail"), false, "")
 		}
 
 		return &response
@@ -177,11 +189,11 @@ var verList = models.Command{
 		}
 
 		for i := 0; i < totalPages; i++ {
-			pageCounter := ctx.Language.GetString(ctx, "PageOf")
+			pageCounter := ctx.Language.GetString("PageOf")
 			pageCounter = strings.ReplaceAll(pageCounter, "<num>", strconv.Itoa(i+1))
 			pageCounter = strings.ReplaceAll(pageCounter, "<total>", strconv.Itoa(totalPages))
 
-			title := fmt.Sprintf("%s - %s", ctx.Language.TranslatePlaceholdersInString(ctx, "<+><version> <list>"), pageCounter)
+			title := fmt.Sprintf("%s - %s", ctx.Language.TranslatePlaceholdersInString("<+><version> <list>"), pageCounter)
 			embed := embedify.Embedify("", title, "", false, "")
 
 			count := 0

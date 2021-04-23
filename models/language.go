@@ -11,6 +11,7 @@ type Language struct {
 	Name      string
 	RawName   string
 	RawObject RawLanguage
+	Prefix    string
 }
 
 // RawLanguage is the raw JSON file as a Go struct.
@@ -61,7 +62,7 @@ type RawLanguage struct {
 	SetVersionSuccess     string `json:"setversionsuccess"`
 	SetVersionFail        string `json:"setversionfail"`
 	VersionUsed           string `json:"versionused"`
-	GuildVersionUsed      string `json:"guildversionused"`
+	ServerVersionUsed     string `json:"serverversionused"`
 	SetVersionUsage       string `json:"setversionusage"`
 	SetServerVersionUsage string `json:"setserverversionusage"`
 	InfoUsage             string `json:"infousage"`
@@ -74,12 +75,12 @@ type RawLanguage struct {
 	SetServerLanguageUsage string `json:"setserverlanguageusage"`
 	ListLanguageUsage      string `json:"listlanguageusage"`
 
-	PrefixOneChar     string `json:"prefixonechar"`
-	PrefixSuccess     string `json:"prefixsuccess"`
-	GuildPrefixUsed   string `json:"guildprefixused"`
-	GuildBracketsUsed string `json:"guildbracketsused"`
-	SetPrefixUsage    string `json:"setprefixsusage"`
-	SetBracketUsage   string `json:"setbracketsusage"`
+	PrefixOneChar      string `json:"prefixonechar"`
+	PrefixSuccess      string `json:"prefixsuccess"`
+	ServerPrefixUsed   string `json:"serverprefixused"`
+	ServerBracketsUsed string `json:"serverbracketsused"`
+	SetPrefixUsage     string `json:"setprefixsusage"`
+	SetBracketUsage    string `json:"setbracketsusage"`
 
 	SetVerseNumbersUsage string `json:"setversenumbersusage"`
 	SetHeadingsUsage     string `json:"setheadingsusage"`
@@ -96,14 +97,14 @@ type RawLanguage struct {
 	FailedSearch     string `json:"failedsearch"`
 	FailedPreference string `json:"failedpreference"`
 
-	NoGuildPerm             string `json:"noguildperm"`
-	SetGuildVersionSuccess  string `json:"setguildversionsuccess"`
-	SetGuildVersionFail     string `json:"setguildversionfail"`
-	SetGuildLanguageSuccess string `json:"setguildlanguagesuccess"`
-	SetGuildLanguageFail    string `json:"setguildlanguagefail"`
-	GuildLanguageUsed       string `json:"guildlanguageused"`
-	SetGuildBracketsSuccess string `json:"setguildbracketssuccess"`
-	GuildBracketsFail       string `json:"guildbracketsfail"`
+	NoServerPerm             string `json:"noserverperm"`
+	SetServerVersionSuccess  string `json:"setserverversionsuccess"`
+	SetServerVersionFail     string `json:"setserverversionfail"`
+	SetServerLanguageSuccess string `json:"setserverlanguagesuccess"`
+	SetServerLanguageFail    string `json:"setserverlanguagefail"`
+	ServerLanguageUsed       string `json:"serverlanguageused"`
+	SetServerBracketsSuccess string `json:"setserverbracketssuccess"`
+	ServerBracketsFail       string `json:"serverbracketsfail"`
 
 	SetVOTDTimeSuccess   string `json:"setvotdtimesuccess"`
 	VOTDTimeUsed         string `json:"votdtimeused"`
@@ -119,11 +120,11 @@ type RawLanguage struct {
 	DonutSpam         string `json:"donutspam"`
 
 	ShardCount      string `json:"shardcount"`
-	CachedGuilds    string `json:"cachedguilds"`
+	CachedServers   string `json:"cachedservers"`
 	CachedChannels  string `json:"cachedchannels"`
 	CachedUsers     string `json:"cachedusers"`
 	PreferenceCount string `json:"preferencecount"`
-	GuildPrefCount  string `json:"guildprefcount"`
+	ServerPrefCount string `json:"serverprefcount"`
 	VersionCount    string `json:"versioncount"`
 	LanguageCount   string `json:"languagecount"`
 	RunningOn       string `json:"runningon"`
@@ -206,8 +207,8 @@ type args struct {
 	False   string `json:"false"`
 }
 
-func (lng Language) GetString(ctx *Context, str string) string {
-	return lng.TranslatePlaceholdersInString(ctx, lng.GetRawString(str))
+func (lng Language) GetString(str string) string {
+	return lng.TranslatePlaceholdersInString(lng.GetRawString(str))
 }
 
 func (lng Language) GetRawString(str string) string {
@@ -222,7 +223,7 @@ func (lng Language) GetRawString(str string) string {
 	return str
 }
 
-func (lng Language) TranslatePlaceholdersInString(ctx *Context, str string) string {
+func (lng Language) TranslatePlaceholdersInString(str string) string {
 	placeholderRegex, _ := regexp.Compile("<([^<>]+)>")
 	placeholders := placeholderRegex.FindAllString(str, -1)
 
@@ -231,7 +232,7 @@ func (lng Language) TranslatePlaceholdersInString(ctx *Context, str string) stri
 
 		switch placeholder {
 		case "<+>":
-			placeholder = ctx.GuildPrefs.Prefix
+			placeholder = lng.Prefix
 		case "<truerandom>":
 			placeholder = lng.GetCommandTranslation("TrueRandom")
 		case "<dailyverse>":

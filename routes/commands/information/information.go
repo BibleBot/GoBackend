@@ -68,13 +68,14 @@ var infoBibleBot = models.Command{
 		} else {
 			lng := ctx.Language
 			title := strings.Replace(lng.GetRawString("BibleBot"), "<version>", ctx.Version, 1)
-			desc := lng.GetString(ctx, "Credit")
+			desc := lng.GetString("Credit")
 
-			commandListName := lng.GetString(ctx, "CommandListName")
-			commandList := lng.GetString(ctx, "CommandList")
+			commandListName := lng.GetString("CommandListName")
+			commandList := lng.GetString("CommandList")
 
-			linksName := lng.GetString(ctx, "Links")
-			links := fmt.Sprintf("%s\n%s\n%s\n%s\n%s\n\n**%s**", lng.GetRawString("Website"), lng.GetRawString("Copyrights"),
+			linksName := lng.GetString("Links")
+			links := fmt.Sprintf("%s\n%s\n%s\n%s\n%s\n\n**%s**",
+				lng.GetRawString("Website"), lng.GetRawString("Copyrights"),
 				lng.GetRawString("Code"), lng.GetRawString("Server"),
 				lng.GetRawString("Terms"), lng.GetRawString("Usage"))
 
@@ -90,22 +91,20 @@ var infoBibleBot = models.Command{
 				links = strings.ReplaceAll(links, k, v)
 			}
 
+			embedFields := map[string]string{
+				commandListName: commandList,
+				"\u200B":        "—————————————",
+				linksName:       links,
+			}
+
 			embed := embedify.Embedify("", title, desc, false, "")
-			embed.Fields = append(embed.Fields, models.EmbedField{
-				Name:   commandListName,
-				Value:  commandList,
-				Inline: false,
-			})
-			embed.Fields = append(embed.Fields, models.EmbedField{
-				Name:   "\u200B",
-				Value:  "—————————————",
-				Inline: false,
-			})
-			embed.Fields = append(embed.Fields, models.EmbedField{
-				Name:   linksName,
-				Value:  links,
-				Inline: false,
-			})
+			for k, v := range embedFields {
+				embed.Fields = append(embed.Fields, models.EmbedField{
+					Name:   k,
+					Value:  v,
+					Inline: false,
+				})
+			}
 
 			return &models.CommandResponse{
 				OK:      true,
