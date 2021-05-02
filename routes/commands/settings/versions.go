@@ -30,7 +30,7 @@ func NewVersionCommandRouter() *VersionCommandRouter {
 	versionOnce.Do(func() {
 		versionInstance = &VersionCommandRouter{
 			DefaultCommand: verDefault,
-			Commands:       []models.Command{verSet, verSetServer, verList},
+			Commands:       []models.Command{verSet, verSetServer, verInfo, verList},
 		}
 	})
 
@@ -78,6 +78,7 @@ var verDefault = models.Command{
 			ctx.DB.Where(&models.Version{Abbreviation: ctx.GuildPrefs.Version}).First(&guildVersion)
 		}
 
+		// srp: It's certainly not as satisfying as JS' template literals, but this is the best I could come up with.
 		tVersionUsed := strings.ReplaceAll(lng.GetRawString("VersionUsed"), "<version>", "**"+userVersion.Name+"**")
 		tGuildVersionUsed := strings.ReplaceAll(lng.GetRawString("ServerVersionUsed"), "<version>", "**"+guildVersion.Name+"**")
 
@@ -126,7 +127,7 @@ var verSet = models.Command{
 			response.Content = embedify.Embedify("", lng.TranslatePlaceholdersInString("<+><version> <set>"), lng.GetString("SetVersionSuccess"), false, "")
 		} else {
 			response.OK = false
-			response.Content = embedify.Embedify("", lng.TranslatePlaceholdersInString("<+><version> <set>"), lng.GetString("SetVersionFail"), false, "")
+			response.Content = embedify.Embedify("", lng.TranslatePlaceholdersInString("<+><version> <set>"), lng.GetString("SetVersionFail"), true, "")
 		}
 
 		return &response
@@ -161,7 +162,37 @@ var verSetServer = models.Command{
 			response.Content = embedify.Embedify("", lng.TranslatePlaceholdersInString("<+><version> <setserver>"), lng.GetString("SetServerVersionSuccess"), false, "")
 		} else {
 			response.OK = false
-			response.Content = embedify.Embedify("", lng.TranslatePlaceholdersInString("<+><version> <setserver>"), lng.GetString("SetServerVersionFail"), false, "")
+			response.Content = embedify.Embedify("", lng.TranslatePlaceholdersInString("<+><version> <setserver>"), lng.GetString("SetServerVersionFail"), true, "")
+		}
+
+		return &response
+	},
+}
+
+var verInfo = models.Command{
+	Command: "info",
+	Process: func(params []string, ctx *models.Context) *models.CommandResponse {
+		var idealVersion *models.Version
+		verResult := ctx.DB.Where(&models.Version{Abbreviation: params[0]}).First(&idealVersion)
+
+		var response models.CommandResponse
+
+		if verResult.Error == nil && params[0] == idealVersion.Abbreviation {
+			conditionMap := map[bool]string{
+				true:  ctx.Language.GetArgumentTranslation("Yes"),
+				false: ctx.Language.GetArgumentTranslation("No"),
+			}
+
+			content := strings.ReplaceAll(ctx.Language.GetRawString("VersionInfo"), "<versionname>", idealVersion.Name)
+			content = strings.ReplaceAll(content, "<hasOT>", conditionMap[idealVersion.SupportsOldTestament])
+			content = strings.ReplaceAll(content, "<hasNT>", conditionMap[idealVersion.SupportsNewTestament])
+			content = strings.ReplaceAll(content, "<hasDEU>", conditionMap[idealVersion.SupportsDeuterocanon])
+
+			response.OK = true
+			response.Content = embedify.Embedify("", ctx.Language.TranslatePlaceholdersInString("<+><version> <info>"), content, false, "")
+		} else {
+			response.OK = false
+			response.Content = embedify.Embedify("", ctx.Language.TranslatePlaceholdersInString("<+><version> <info>"), ctx.Language.GetString("VersionInfoFailed"), true, "")
 		}
 
 		return &response
