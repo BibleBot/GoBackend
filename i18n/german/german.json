@@ -114,7 +114,7 @@
     "commands": {
         "search": "suchen",
         "version": "version",
-        "set": "satz",
+        "set": "einstellen",
         "setserver": "servereinstellung",
         "setup": "einrichtung",
         "list": "liste",
@@ -136,7 +136,7 @@
         "language": "sprache",
         "setprefix": "präfixfestlegen",
         "setbrackets": "klammersetzung",
-        "clear": "frei machen",
+        "clear": "löschen",
         "nicene": "nicäa",
         "nicene325": "nicäa325",
         "apostles": "apostolisch",
